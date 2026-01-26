@@ -224,4 +224,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 1,
   },
+  stickerContainer: {
+    position: 'absolute',
+    top: 5,
+    left: 10,
+    zIndex: 10,
+    transform: [{ rotate: '-10deg' }],
+  },
+  sticker: {
+    width: 65,
+    height: 65,
+    borderRadius: 32,
+    borderWidth: 3,
+    borderColor: '#FFB6C1',
+  },
 });
