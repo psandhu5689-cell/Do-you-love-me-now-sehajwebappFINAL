@@ -127,7 +127,10 @@ export default function Confession() {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push('/question')}
+            onPress={() => {
+              playPop();
+              router.push('/question');
+            }}
             activeOpacity={0.8}
           >
             <Text style={styles.buttonText}>One last thing</Text>

@@ -72,6 +72,7 @@ const POEMS: Poem[] = [
 export default function Poems() {
   const router = useRouter();
   const { userName } = useUser();
+  const { playPop } = useAudio();
   const [currentPoemIndex, setCurrentPoemIndex] = useState(0);
   const [visibleLines, setVisibleLines] = useState(0);
   const [poemComplete, setPoemComplete] = useState(false);
@@ -116,6 +117,7 @@ export default function Poems() {
   }, [currentPoemIndex]);
 
   const handleNext = () => {
+    playPop();
     if (isLastPoem) {
       router.push('/confession');
     } else {
