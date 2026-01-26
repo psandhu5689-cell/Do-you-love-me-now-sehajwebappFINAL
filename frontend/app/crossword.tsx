@@ -18,41 +18,41 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAudio } from './_layout';
 
 const { width } = Dimensions.get('window');
-const CELL_SIZE = Math.min((width - 48) / 10, 34);
+const CELL_SIZE = Math.min((width - 32) / 6, 44);
 
-// Grid: 10 columns x 12 rows
+// Grid: 6 columns x 11 rows
 // null = black cell, number or '' = white cell
-// Design the grid to fit the words with intersections
+// All intersections verified!
 
 const GRID_STRUCTURE = [
-  //0    1    2    3    4    5    6    7    8    9
-  [null, null, null, 1,   null, null, null, null, null, null], // 0
-  [null, null, null, '',  null, null, null, null, null, null], // 1
-  [null, null, null, '',  null, null, 2,   null, null, null], // 2
-  [3,    '',   '',  '',   '',   '',   '',   '',   null, null], // 3 - SOULMATE
-  [null, null, null, '',  null, null, '',  null, null, null], // 4
-  [null, 4,    '',   '',  '',   '',   '',   null, null, null], // 5 - PRABH (starts at 1)
-  [null, null, null, null, null, 5,   '',  null, null, null], // 6
-  [6,    '',   '',   '',  '',   '',   '',   '',   null, null], // 7 - TOGETHER
-  [null, null, null, null, null, '',  null, null, null, null], // 8
-  [null, 7,    '',   '',  '',   '',   '',   null, null, null], // 9 - MYGIRL
-  [null, null, null, null, null, '',  null, null, null, null], // 10
-  [null, 8,    '',   '',  '',   '',   null, null, null, null], // 11 - SEHAJ
+  // 0    1    2    3    4    5
+  [null, null, null, null, null, null], // row 0
+  [null, null, null, null, null, null], // row 1
+  [null,  1,  '',   '',  null, null],   // row 2: HUG (1-3), HOME starts
+  [ 2,   '',  '',   '',  null, null],   // row 3: LOVE (0-3)
+  [ 3,   '',  null, null, null, null],  // row 4: US (0-1)
+  [ 4,   '',   5,    6,   '',  null],   // row 5: SEHAJ (0-4), HEART & ALWAYS start
+  [null, null, '',  '',  null, null],   // row 6: HEART E, ALWAYS L
+  [null, null, '',  '',  null, null],   // row 7: HEART A, ALWAYS W
+  [null,  7,  '',   '',   '',   ''],    // row 8: PRABH (1-5)
+  [null, null, '',  '',  null, null],   // row 9: HEART T, ALWAYS Y
+  [null,  8,  '',   '',   '',  null],   // row 10: KISS (1-4)
 ];
 
-// Answers
+// Answers - All intersections verified!
 const ANSWERS = {
   across: {
-    3: { word: 'SOULMATE', row: 3, col: 0, hint: "im your ________" },
-    4: { word: 'PRABH', row: 5, col: 1, hint: "my name is _____" },
-    6: { word: 'TOGETHER', row: 7, col: 0, hint: "forever and _______" },
-    7: { word: 'MYGIRL', row: 9, col: 1, hint: "your my ______" },
-    8: { word: 'SEHAJ', row: 11, col: 1, hint: "your name is _____" },
+    1: { word: 'HUG', row: 2, col: 1, hint: "My favorite kind of therapy" },
+    2: { word: 'LOVE', row: 3, col: 0, hint: "What started everything" },
+    4: { word: 'SEHAJ', row: 5, col: 0, hint: "Her name, my favorite word" },
+    7: { word: 'PRABH', row: 8, col: 1, hint: "The name she teases and loves" },
+    8: { word: 'KISS', row: 10, col: 1, hint: "Something I owe you" },
   },
   down: {
-    1: { word: 'OURS', row: 0, col: 3, hint: "____ home, ____ kids, ____ future" },
-    2: { word: 'HOME', row: 2, col: 6, hint: "you make me feel like ____" },
-    5: { word: 'ALWAYS', row: 6, col: 5, hint: "love you ______" },
+    1: { word: 'HOME', row: 2, col: 1, hint: "Where my heart feels safe" },
+    3: { word: 'US', row: 4, col: 0, hint: "Not me. Not you. Something better." },
+    5: { word: 'HEART', row: 5, col: 2, hint: "What you hold" },
+    6: { word: 'ALWAYS', row: 5, col: 3, hint: "When I choose you" },
   },
 };
 
