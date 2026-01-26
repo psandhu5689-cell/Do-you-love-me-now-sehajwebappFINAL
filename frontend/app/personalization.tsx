@@ -13,11 +13,12 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useUser } from './_layout';
+import { useUser, useAudio } from './_layout';
 
 export default function Personalization() {
   const router = useRouter();
   const { setUserName } = useUser();
+  const { playPop } = useAudio();
   const [name, setName] = useState('');
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
