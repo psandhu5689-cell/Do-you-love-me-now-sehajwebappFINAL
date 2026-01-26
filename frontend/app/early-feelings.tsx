@@ -143,7 +143,10 @@ export default function EarlyFeelings() {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push('/memories')}
+            onPress={() => {
+              playPop();
+              router.push('/memories');
+            }}
             activeOpacity={0.8}
           >
             <Text style={styles.buttonText}>Next</Text>
