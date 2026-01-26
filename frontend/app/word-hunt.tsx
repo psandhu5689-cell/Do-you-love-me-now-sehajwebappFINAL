@@ -479,8 +479,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FAFAFA',
-    margin: 1,
-    borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: '#E8E8E8',
   },
   selectedCell: {
     backgroundColor: '#FFE4EC',
