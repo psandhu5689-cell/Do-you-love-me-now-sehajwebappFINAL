@@ -6,25 +6,126 @@ import {
   TouchableOpacity,
   Animated,
   ScrollView,
+  Dimensions,
+  PanResponder,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAudio } from './_layout';
 
-const HIDDEN_WORDS = ['LOVE', 'SEHAJ', 'US', 'FOREVER', 'HOME'];
+const { width } = Dimensions.get('window');
+const GRID_SIZE = 15;
+const CELL_SIZE = Math.floor((width - 32) / GRID_SIZE);
 
-const PARAGRAPH_TEXT = `In this journey called LOVE, I found someone who makes every moment feel like FOREVER. SEHAJ, you became my world, my HOME, and everything in between. When it's US together, nothing else matters. You are my FOREVER, and I want to spend every day making you smile.`;
+// Words to find
+const WORDS_TO_FIND = [
+  'SOULMATE',
+  'TOGETHER', 
+  'FOREVER',
+  'PROMISE',
+  'KISSING',
+  'DATING',
+  'SEHAJ',
+  'PRABH',
+  'HEART',
+  'LOYAL',
+  'HOME',
+  'TRUST',
+  'LOVE',
+  'HUG',
+];
+
+// Generate grid with words placed
+const generateGrid = () => {
+  // Initialize empty grid
+  const grid: string[][] = Array(GRID_SIZE).fill(null).map(() => 
+    Array(GRID_SIZE).fill('')
+  );
+  
+  // Word placements (row, col, direction: 'H'=horizontal, 'V'=vertical, 'D'=diagonal)
+  const placements: {word: string, row: number, col: number, dir: 'H' | 'V' | 'D'}[] = [
+    { word: 'TOGETHER', row: 1, col: 3, dir: 'H' },
+    { word: 'SOULMATE', row: 3, col: 0, dir: 'H' },
+    { word: 'FOREVER', row: 7, col: 4, dir: 'H' },
+    { word: 'PROMISE', row: 9, col: 7, dir: 'H' },
+    { word: 'SEHAJ', row: 12, col: 9, dir: 'H' },
+    { word: 'PRABH', row: 5, col: 10, dir: 'V' },
+    { word: 'HEART', row: 0, col: 0, dir: 'V' },
+    { word: 'LOYAL', row: 2, col: 14, dir: 'V' },
+    { word: 'TRUST', row: 10, col: 2, dir: 'V' },
+    { word: 'LOVE', row: 4, col: 6, dir: 'D' },
+    { word: 'HOME', row: 8, col: 0, dir: 'H' },
+    { word: 'KISSING', row: 6, col: 0, dir: 'H' },
+    { word: 'DATING', row: 11, col: 0, dir: 'H' },
+    { word: 'HUG', row: 0, col: 12, dir: 'V' },
+  ];
+  
+  // Place words
+  placements.forEach(({ word, row, col, dir }) => {
+    for (let i = 0; i < word.length; i++) {
+      if (dir === 'H') {
+        if (row < GRID_SIZE && col + i < GRID_SIZE) {
+          grid[row][col + i] = word[i];
+        }
+      } else if (dir === 'V') {
+        if (row + i < GRID_SIZE && col < GRID_SIZE) {
+          grid[row + i][col] = word[i];
+        }
+      } else if (dir === 'D') {
+        if (row + i < GRID_SIZE && col + i < GRID_SIZE) {
+          grid[row + i][col + i] = word[i];
+        }
+      }
+    }
+  });
+  
+  // Fill empty cells with random letters
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for (let r = 0; r < GRID_SIZE; r++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
+      if (!grid[r][c]) {
+        grid[r][c] = letters[Math.floor(Math.random() * letters.length)];
+      }
+    }
+  }
+  
+  return { grid, placements };
+};
+
+// Store word positions for checking
+const getWordCells = (placements: any[]) => {
+  const wordCells: { [word: string]: { row: number, col: number }[] } = {};
+  
+  placements.forEach(({ word, row, col, dir }) => {
+    wordCells[word] = [];
+    for (let i = 0; i < word.length; i++) {
+      if (dir === 'H') {
+        wordCells[word].push({ row, col: col + i });
+      } else if (dir === 'V') {
+        wordCells[word].push({ row: row + i, col });
+      } else if (dir === 'D') {
+        wordCells[word].push({ row: row + i, col: col + i });
+      }
+    }
+  });
+  
+  return wordCells;
+};
 
 export default function WordHunt() {
   const router = useRouter();
+  const [{ grid, placements }] = useState(generateGrid);
+  const [wordCells] = useState(() => getWordCells(placements));
   const [foundWords, setFoundWords] = useState<Set<string>>(new Set());
-  const [selectedText, setSelectedText] = useState('');
+  const [selectedCells, setSelectedCells] = useState<{row: number, col: number}[]>([]);
+  const [highlightedCells, setHighlightedCells] = useState<Set<string>>(new Set());
+  const [isSelecting, setIsSelecting] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const celebrateAnim = useRef(new Animated.Value(0)).current;
-  const { playSuccess, playComplete } = useAudio();
+  const { playSuccess, playComplete, playClick } = useAudio();
 
-  const allWordsFound = foundWords.size === HIDDEN_WORDS.length;
+  const allWordsFound = foundWords.size === WORDS_TO_FIND.length;
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -36,6 +137,7 @@ export default function WordHunt() {
 
   useEffect(() => {
     if (allWordsFound) {
+      playComplete();
       Animated.spring(celebrateAnim, {
         toValue: 1,
         tension: 50,
@@ -45,45 +147,74 @@ export default function WordHunt() {
     }
   }, [allWordsFound]);
 
-  const handleWordPress = (word: string) => {
-    const upperWord = word.toUpperCase();
-    if (HIDDEN_WORDS.includes(upperWord) && !foundWords.has(upperWord)) {
-      playSuccess();
-      setFoundWords((prev) => new Set([...prev, upperWord]));
+  const getCellKey = (row: number, col: number) => `${row}-${col}`;
+
+  const checkSelection = (cells: {row: number, col: number}[]) => {
+    // Get selected letters
+    const selectedWord = cells.map(c => grid[c.row]?.[c.col] || '').join('');
+    const reversedWord = selectedWord.split('').reverse().join('');
+    
+    // Check if matches any word
+    for (const word of WORDS_TO_FIND) {
+      if (!foundWords.has(word) && (selectedWord === word || reversedWord === word)) {
+        // Found a word!
+        playSuccess();
+        setFoundWords(prev => new Set([...prev, word]));
+        
+        // Highlight these cells permanently
+        const newHighlighted = new Set(highlightedCells);
+        cells.forEach(c => newHighlighted.add(getCellKey(c.row, c.col)));
+        setHighlightedCells(newHighlighted);
+        
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const handleCellPress = (row: number, col: number) => {
+    if (isSelecting) {
+      // Add to selection
+      const lastCell = selectedCells[selectedCells.length - 1];
+      if (lastCell) {
+        // Check if adjacent or in line
+        const rowDiff = row - lastCell.row;
+        const colDiff = col - lastCell.col;
+        
+        // Allow horizontal, vertical, or diagonal selection
+        if (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1) {
+          const newCells = [...selectedCells, { row, col }];
+          setSelectedCells(newCells);
+        }
+      }
+    } else {
+      // Start new selection
+      playClick();
+      setIsSelecting(true);
+      setSelectedCells([{ row, col }]);
     }
   };
 
-  const renderParagraph = () => {
-    const words = PARAGRAPH_TEXT.split(' ');
-    return words.map((word, index) => {
-      const cleanWord = word.replace(/[.,!?]/g, '').toUpperCase();
-      const isHidden = HIDDEN_WORDS.includes(cleanWord);
-      const isFound = foundWords.has(cleanWord);
+  const handleSelectionEnd = () => {
+    if (selectedCells.length > 1) {
+      checkSelection(selectedCells);
+    }
+    setIsSelecting(false);
+    setSelectedCells([]);
+  };
 
-      if (isHidden) {
-        return (
-          <TouchableOpacity
-            key={index}
-            onPress={() => handleWordPress(cleanWord)}
-            activeOpacity={0.7}
-          >
-            <Text
-              style={[
-                styles.word,
-                isFound ? styles.foundWord : styles.hiddenWord,
-              ]}
-            >
-              {word + ' '}
-            </Text>
-          </TouchableOpacity>
-        );
-      }
-      return (
-        <Text key={index} style={styles.word}>
-          {word + ' '}
-        </Text>
-      );
-    });
+  const isCellSelected = (row: number, col: number) => {
+    return selectedCells.some(c => c.row === row && c.col === col);
+  };
+
+  const isCellHighlighted = (row: number, col: number) => {
+    return highlightedCells.has(getCellKey(row, col));
+  };
+
+  const getWordColor = (word: string) => {
+    const colors = ['#FF6B9D', '#9B59B6', '#FFB347', '#4CAF50', '#3498DB', '#E74C3C', '#1ABC9C'];
+    const index = WORDS_TO_FIND.indexOf(word) % colors.length;
+    return colors[index];
   };
 
   return (
@@ -93,20 +224,73 @@ export default function WordHunt() {
         showsVerticalScrollIndicator={false}
       >
         <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-          <Text style={styles.pageLabel}>Word Hunt</Text>
+          <Text style={styles.pageLabel}>Word Search</Text>
+          <Text style={styles.subtitle}>Find all our special words! 💕</Text>
 
-          <View style={styles.instructionCard}>
-            <Ionicons name="search" size={24} color="#FF6B9D" />
-            <Text style={styles.instructionText}>
-              Find and tap the hidden words in the text below
+          {/* Progress */}
+          <View style={styles.progressContainer}>
+            <Text style={styles.progressText}>
+              {foundWords.size} / {WORDS_TO_FIND.length} words found
             </Text>
+            <View style={styles.progressBar}>
+              <View
+                style={[
+                  styles.progressFill,
+                  { width: `${(foundWords.size / WORDS_TO_FIND.length) * 100}%` },
+                ]}
+              />
+            </View>
           </View>
+
+          {/* Word Grid */}
+          <View 
+            style={styles.gridContainer}
+            onTouchEnd={handleSelectionEnd}
+          >
+            {grid.map((row, rowIndex) => (
+              <View key={rowIndex} style={styles.gridRow}>
+                {row.map((letter, colIndex) => {
+                  const isSelected = isCellSelected(rowIndex, colIndex);
+                  const isHighlighted = isCellHighlighted(rowIndex, colIndex);
+                  
+                  return (
+                    <TouchableOpacity
+                      key={colIndex}
+                      style={[
+                        styles.cell,
+                        isSelected && styles.selectedCell,
+                        isHighlighted && styles.highlightedCell,
+                      ]}
+                      onPress={() => handleCellPress(rowIndex, colIndex)}
+                      onPressIn={() => handleCellPress(rowIndex, colIndex)}
+                      activeOpacity={0.7}
+                    >
+                      <Text
+                        style={[
+                          styles.cellText,
+                          isSelected && styles.selectedCellText,
+                          isHighlighted && styles.highlightedCellText,
+                        ]}
+                      >
+                        {letter}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            ))}
+          </View>
+
+          {/* Instruction */}
+          <Text style={styles.instruction}>
+            Tap letters to select, tap last letter again to confirm
+          </Text>
 
           {/* Word List */}
           <View style={styles.wordListContainer}>
             <Text style={styles.wordListTitle}>Words to find:</Text>
             <View style={styles.wordList}>
-              {HIDDEN_WORDS.map((word) => (
+              {WORDS_TO_FIND.map((word) => (
                 <View
                   key={word}
                   style={[
@@ -123,26 +307,14 @@ export default function WordHunt() {
                     {word}
                   </Text>
                   {foundWords.has(word) && (
-                    <Ionicons name="checkmark" size={16} color="#FFFFFF" />
+                    <Ionicons name="checkmark" size={14} color="#FFFFFF" />
                   )}
                 </View>
               ))}
             </View>
           </View>
 
-          {/* Paragraph */}
-          <View style={styles.paragraphCard}>
-            <View style={styles.paragraphContent}>{renderParagraph()}</View>
-          </View>
-
-          {/* Progress */}
-          <View style={styles.progressContainer}>
-            <Text style={styles.progressText}>
-              {foundWords.size} of {HIDDEN_WORDS.length} words found
-            </Text>
-          </View>
-
-          {/* Completion Message */}
+          {/* Completion */}
           {allWordsFound && (
             <Animated.View
               style={[
@@ -153,9 +325,10 @@ export default function WordHunt() {
                 },
               ]}
             >
-              <Ionicons name="heart" size={40} color="#FF6B9D" />
+              <Ionicons name="heart" size={50} color="#FF6B9D" />
+              <Text style={styles.completionTitle}>Amazing! 🎉</Text>
               <Text style={styles.completionText}>
-                "You found every word.{"\n"}I found my person."
+                "You found every word. I found my person."
               </Text>
               <TouchableOpacity
                 style={styles.button}
@@ -183,7 +356,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    padding: 24,
+    padding: 16,
   },
   content: {
     alignItems: 'center',
@@ -193,35 +366,100 @@ const styles = StyleSheet.create({
     color: '#9B7FA7',
     letterSpacing: 3,
     textTransform: 'uppercase',
-    marginBottom: 20,
+    marginBottom: 4,
   },
-  instructionCard: {
-    flexDirection: 'row',
+  subtitle: {
+    fontSize: 16,
+    color: '#6B5B6B',
+    marginBottom: 12,
+  },
+  progressContainer: {
+    width: '100%',
+    marginBottom: 16,
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 16,
-    gap: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-    marginBottom: 20,
   },
-  instructionText: {
-    flex: 1,
+  progressText: {
     fontSize: 14,
-    color: '#5A4A5A',
+    color: '#9B7FA7',
+    marginBottom: 6,
+    fontWeight: '600',
+  },
+  progressBar: {
+    width: '100%',
+    height: 8,
+    backgroundColor: '#FFE4EC',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#FF6B9D',
+    borderRadius: 4,
+  },
+  gridContainer: {
+    backgroundColor: '#FFFFFF',
+    padding: 4,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  gridRow: {
+    flexDirection: 'row',
+  },
+  cell: {
+    width: CELL_SIZE,
+    height: CELL_SIZE,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FAFAFA',
+    margin: 1,
+    borderRadius: 4,
+  },
+  selectedCell: {
+    backgroundColor: '#FFE4EC',
+    borderWidth: 2,
+    borderColor: '#FF6B9D',
+  },
+  highlightedCell: {
+    backgroundColor: '#FF6B9D',
+  },
+  cellText: {
+    fontSize: CELL_SIZE * 0.55,
+    fontWeight: '700',
+    color: '#4A1942',
+  },
+  selectedCellText: {
+    color: '#FF6B9D',
+  },
+  highlightedCellText: {
+    color: '#FFFFFF',
+  },
+  instruction: {
+    fontSize: 12,
+    color: '#9B7FA7',
+    marginTop: 12,
+    fontStyle: 'italic',
   },
   wordListContainer: {
     width: '100%',
-    marginBottom: 20,
+    marginTop: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
   },
   wordListTitle: {
-    fontSize: 13,
-    color: '#9B7FA7',
-    marginBottom: 10,
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#4A1942',
+    marginBottom: 12,
   },
   wordList: {
     flexDirection: 'row',
@@ -232,82 +470,48 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFE4EC',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 4,
   },
   wordChipFound: {
     backgroundColor: '#4CAF50',
   },
   wordChipText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
     color: '#FF6B9D',
   },
   wordChipTextFound: {
     color: '#FFFFFF',
-  },
-  paragraphCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 24,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  paragraphContent: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  word: {
-    fontSize: 17,
-    lineHeight: 32,
-    color: '#4A1942',
-  },
-  hiddenWord: {
-    backgroundColor: '#FFE4EC',
-    color: '#FF6B9D',
-    fontWeight: '600',
-    paddingHorizontal: 2,
-    borderRadius: 4,
-  },
-  foundWord: {
-    backgroundColor: '#4CAF50',
-    color: '#FFFFFF',
-    fontWeight: '600',
-    paddingHorizontal: 2,
-    borderRadius: 4,
-  },
-  progressContainer: {
-    marginTop: 20,
-  },
-  progressText: {
-    fontSize: 14,
-    color: '#9B7FA7',
+    textDecorationLine: 'line-through',
   },
   completionContainer: {
-    marginTop: 30,
-    alignItems: 'center',
-    padding: 24,
+    marginTop: 24,
+    padding: 28,
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
+    borderRadius: 28,
+    alignItems: 'center',
     shadowColor: '#FF6B9D',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 10,
+    width: '100%',
+  },
+  completionTitle: {
+    fontSize: 28,
+    fontWeight: '600',
+    color: '#FF6B9D',
+    marginTop: 12,
   },
   completionText: {
-    fontSize: 18,
+    fontSize: 16,
     fontStyle: 'italic',
-    color: '#4A1942',
+    color: '#5A4A5A',
     textAlign: 'center',
     marginVertical: 16,
-    lineHeight: 28,
   },
   button: {
     flexDirection: 'row',
@@ -317,7 +521,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 25,
     gap: 8,
-    marginTop: 8,
   },
   buttonText: {
     color: '#FFFFFF',
