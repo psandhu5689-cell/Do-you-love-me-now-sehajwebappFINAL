@@ -11,13 +11,14 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useUser } from './_layout';
+import { useUser, useAudio } from './_layout';
 
 const STICKER_BABY = 'https://customer-assets.emergentagent.com/job_love-adventure-49/artifacts/dhaq8syh_IMG_5559.png';
 
 export default function EarlyFeelings() {
   const router = useRouter();
   const { userName } = useUser();
+  const { playPop } = useAudio();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const card1Anim = useRef(new Animated.Value(50)).current;
   const card2Anim = useRef(new Animated.Value(50)).current;
