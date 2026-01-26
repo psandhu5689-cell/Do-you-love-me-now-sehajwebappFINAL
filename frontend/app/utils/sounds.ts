@@ -78,6 +78,14 @@ class SoundManager {
     await this.play('complete');
   }
 
+  async playDrumroll() {
+    await this.play('drumroll');
+  }
+
+  async playKiss() {
+    await this.play('kiss');
+  }
+
   async unloadAll() {
     for (const sound of Object.values(this.sounds)) {
       if (sound) {
