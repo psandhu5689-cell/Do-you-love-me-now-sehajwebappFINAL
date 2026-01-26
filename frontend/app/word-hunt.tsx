@@ -22,6 +22,7 @@ export default function WordHunt() {
   const [selectedText, setSelectedText] = useState('');
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const celebrateAnim = useRef(new Animated.Value(0)).current;
+  const { playSuccess, playComplete } = useAudio();
 
   const allWordsFound = foundWords.size === HIDDEN_WORDS.length;
 
@@ -47,6 +48,7 @@ export default function WordHunt() {
   const handleWordPress = (word: string) => {
     const upperWord = word.toUpperCase();
     if (HIDDEN_WORDS.includes(upperWord) && !foundWords.has(upperWord)) {
+      playSuccess();
       setFoundWords((prev) => new Set([...prev, upperWord]));
     }
   };
@@ -157,7 +159,10 @@ export default function WordHunt() {
               </Text>
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => router.push('/crossword')}
+                onPress={() => {
+                  playComplete();
+                  router.push('/crossword');
+                }}
                 activeOpacity={0.8}
               >
                 <Text style={styles.buttonText}>Continue</Text>
