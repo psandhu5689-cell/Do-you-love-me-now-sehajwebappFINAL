@@ -23,7 +23,7 @@ const REVEAL_LINES = [
 export default function Question() {
   const router = useRouter();
   const { userName } = useUser();
-  const { playMagic, playComplete, playDrumroll } = useAudio();
+  const { playMagic, playComplete, playDrumroll, playClick } = useAudio();
   const [currentLine, setCurrentLine] = useState(0);
   const [showQuestion, setShowQuestion] = useState(false);
   const [showButtons, setShowButtons] = useState(false);
