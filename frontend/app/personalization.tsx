@@ -9,6 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  ScrollView,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -48,47 +50,61 @@ export default function Personalization() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
-        <Animated.View
-          style={[
-            styles.content,
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }],
-            },
-          ]}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardView}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
         >
-          <Ionicons name="sparkles" size={40} color="#FF6B9D" style={styles.icon} />
-
-          <Text style={styles.prompt}>What should I call you?</Text>
-
-          <Text style={styles.hint}>(You can skip to continue as Sehaj)</Text>
-
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              value={name}
-              onChangeText={setName}
-              placeholder="Your name..."
-              placeholderTextColor="#C9A7C9"
-              autoCapitalize="words"
-              autoFocus
-            />
-          </View>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleContinue}
-            activeOpacity={0.8}
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.buttonText}>Continue</Text>
-            <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
-          </TouchableOpacity>
-        </Animated.View>
-      </KeyboardAvoidingView>
+            <Animated.View
+              style={[
+                styles.content,
+                {
+                  opacity: fadeAnim,
+                  transform: [{ translateY: slideAnim }],
+                },
+              ]}
+            >
+              <Ionicons name="sparkles" size={40} color="#FF6B9D" style={styles.icon} />
+
+              <Text style={styles.prompt}>What should I call you?</Text>
+
+              <Text style={styles.playfulText}>
+                wife, Berryboo, poopypants,{'\n'}whatever your name is 💕
+              </Text>
+
+              <Text style={styles.hint}>(You can skip to continue as Sehaj)</Text>
+
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  value={name}
+                  onChangeText={setName}
+                  placeholder="Your name..."
+                  placeholderTextColor="#C9A7C9"
+                  autoCapitalize="words"
+                  returnKeyType="done"
+                  onSubmitEditing={handleContinue}
+                />
+              </View>
+
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleContinue}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.buttonText}>Continue</Text>
+                <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+              </TouchableOpacity>
+            </Animated.View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 }
