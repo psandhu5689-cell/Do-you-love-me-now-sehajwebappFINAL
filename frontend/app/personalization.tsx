@@ -117,11 +117,15 @@ const styles = StyleSheet.create({
   keyboardView: {
     flex: 1,
   },
-  content: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
+  },
+  content: {
     alignItems: 'center',
     padding: 32,
+    paddingTop: 60,
+    paddingBottom: 60,
   },
   icon: {
     marginBottom: 30,
@@ -130,9 +134,17 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '300',
     color: '#4A1942',
-    marginBottom: 8,
+    marginBottom: 12,
     textAlign: 'center',
     letterSpacing: 0.5,
+  },
+  playfulText: {
+    fontSize: 15,
+    color: '#FF6B9D',
+    marginBottom: 8,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    lineHeight: 22,
   },
   hint: {
     fontSize: 13,
