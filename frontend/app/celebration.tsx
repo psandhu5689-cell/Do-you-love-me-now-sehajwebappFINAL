@@ -384,4 +384,23 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
   },
+  stickerLeft: {
+    position: 'absolute',
+    top: 120,
+    left: 10,
+    zIndex: 10,
+  },
+  stickerRight: {
+    position: 'absolute',
+    top: 120,
+    right: 10,
+    zIndex: 10,
+  },
+  sticker: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
+  },
 });
