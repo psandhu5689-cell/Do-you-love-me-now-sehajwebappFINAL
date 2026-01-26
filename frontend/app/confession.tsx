@@ -123,6 +123,11 @@ export default function Confession() {
               Every moment with you feels like a gift I never knew I deserved.
               You've become my favorite person, my safe place, my everything.
             </Text>
+
+            <View style={styles.dateContainer}>
+              <Ionicons name="calendar-heart" size={20} color="#FF6B9D" />
+              <Text style={styles.dateText}>July 11 — Our day 💕</Text>
+            </View>
           </View>
 
           <TouchableOpacity
