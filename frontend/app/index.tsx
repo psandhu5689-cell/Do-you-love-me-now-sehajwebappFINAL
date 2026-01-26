@@ -202,4 +202,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 3,
   },
+  stickerContainer: {
+    position: 'absolute',
+    top: 60,
+    right: 20,
+    zIndex: 10,
+  },
+  sticker: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
+  },
 });
