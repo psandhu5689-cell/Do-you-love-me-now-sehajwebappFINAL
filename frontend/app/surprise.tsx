@@ -8,6 +8,7 @@ import {
   Vibration,
   Platform,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -15,10 +16,11 @@ import { useAudio } from './_layout';
 import * as Haptics from 'expo-haptics';
 
 export default function Surprise() {
+  const router = useRouter();
   const [hasPressed, setHasPressed] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
   const [isVibrating, setIsVibrating] = useState(false);
-  const { playKiss } = useAudio();
+  const { playKiss, playClick } = useAudio();
   
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const glowAnim = useRef(new Animated.Value(0.3)).current;
