@@ -228,6 +228,21 @@ const styles = StyleSheet.create({
     color: '#6B5B6B',
     textAlign: 'center',
   },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+    padding: 12,
+    backgroundColor: '#FFF0F5',
+    borderRadius: 20,
+    gap: 8,
+  },
+  dateText: {
+    fontSize: 15,
+    color: '#FF6B9D',
+    fontWeight: '600',
+  },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
