@@ -111,6 +111,15 @@ export default function Question() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Back Button */}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => { playClick(); router.back(); }}
+        activeOpacity={0.7}
+      >
+        <Ionicons name="chevron-back" size={28} color="#FF6B9D" />
+      </TouchableOpacity>
+
       {/* Floating Hearts Background */}
       <View style={styles.heartsBackground}>
         {[...Array(8)].map((_, i) => (
