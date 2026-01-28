@@ -10,7 +10,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
+import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../src/theme/ThemeContext';
+import { useMusic } from '../src/context/MusicContext';
+import * as Haptics from 'expo-haptics';
 
 const { width, height } = Dimensions.get('window');
 const WHISPER_AUDIO = 'https://customer-assets.emergentagent.com/job_sehaj-love/artifacts/n3ojmbeq_e6d8893a.mp3';
@@ -29,14 +33,26 @@ const generateStars = (count: number) => {
 const STARS = generateStars(100);
 
 export default function QuietStars() {
+  const router = useRouter();
   const { colors, isDark } = useTheme();
+  const { toggleMute, isMuted } = useMusic();
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioLoaded, setAudioLoaded] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const textFadeAnim = useRef(new Animated.Value(0)).current;
   const starAnims = useRef(STARS.map(() => new Animated.Value(0.3))).current;
+  const wasMutedRef = useRef(isMuted);
 
   useEffect(() => {
+    // Store the mute state before we potentially unmute
+    wasMutedRef.current = isMuted;
+    
+    // Mute background music when entering this page
+    if (!isMuted) {
+      toggleMute();
+    }
+
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 2000,
@@ -69,16 +85,20 @@ export default function QuietStars() {
       setTimeout(twinkle, STARS[index].twinkleDelay);
     });
 
-    loadAudio();
+    loadAndAutoPlayAudio();
 
     return () => {
       if (sound) {
         sound.unloadAsync();
       }
+      // Restore music when leaving if it was playing before
+      if (!wasMutedRef.current) {
+        toggleMute();
+      }
     };
   }, []);
 
-  const loadAudio = async () => {
+  const loadAndAutoPlayAudio = async () => {
     try {
       await Audio.setAudioModeAsync({
         playsInSilentModeIOS: true,
@@ -88,11 +108,23 @@ export default function QuietStars() {
 
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: WHISPER_AUDIO },
-        { shouldPlay: false, volume: 1.0 }
+        { shouldPlay: true, volume: 1.0 },
+        onPlaybackStatusUpdate
       );
       setSound(newSound);
+      setAudioLoaded(true);
+      setIsPlaying(true);
     } catch (error) {
       console.log('Error loading whisper audio:', error);
+    }
+  };
+
+  const onPlaybackStatusUpdate = (status: any) => {
+    if (status.isLoaded) {
+      if (status.didJustFinish) {
+        // Audio finished playing, stop and reset
+        setIsPlaying(false);
+      }
     }
   };
 
@@ -103,9 +135,16 @@ export default function QuietStars() {
       await sound.pauseAsync();
       setIsPlaying(false);
     } else {
+      // Reset to beginning and play again
+      await sound.setPositionAsync(0);
       await sound.playAsync();
       setIsPlaying(true);
     }
+  };
+
+  const handleGoBack = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    router.push('/');
   };
 
   // This page always uses dark mode for the starry effect
@@ -163,6 +202,21 @@ export default function QuietStars() {
 
         <Animated.View style={[styles.bottomContainer, { opacity: textFadeAnim }]}>
           <Text style={styles.bottomText}>for you, always 💕</Text>
+          
+          {/* Back to Begin Button */}
+          <TouchableOpacity
+            onPress={handleGoBack}
+            activeOpacity={0.9}
+            style={styles.backButtonContainer}
+          >
+            <LinearGradient
+              colors={['#FF6B9D', '#C44569']}
+              style={styles.backButton}
+            >
+              <Ionicons name="home" size={18} color="#FFFFFF" />
+              <Text style={styles.backButtonText}>Back to Begin</Text>
+            </LinearGradient>
+          </TouchableOpacity>
         </Animated.View>
       </SafeAreaView>
     </Animated.View>
@@ -240,7 +294,7 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     position: 'absolute',
-    bottom: 50,
+    bottom: 80,
     left: 0,
     right: 0,
     alignItems: 'center',
@@ -249,5 +303,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'rgba(255,255,255,0.4)',
     fontStyle: 'italic',
+    marginBottom: 20,
+  },
+  backButtonContainer: {
+    marginTop: 10,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 25,
+    gap: 8,
+  },
+  backButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
