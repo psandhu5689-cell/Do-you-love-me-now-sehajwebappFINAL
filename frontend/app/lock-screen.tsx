@@ -10,12 +10,17 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAudio } from './_layout';
+import { useTheme } from './theme/ThemeContext';
+import { ThemedBackground, ThemedCard } from './components/themed';
+import * as Haptics from 'expo-haptics';
 
-const CORRECT_CODE = '0711'; // July 11 anniversary
+const CORRECT_CODE = '0711';
 
 export default function LockScreen() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
   const { playClick, playSuccess, playComplete } = useAudio();
   const [code, setCode] = useState('');
   const [isUnlocked, setIsUnlocked] = useState(false);
@@ -35,6 +40,7 @@ export default function LockScreen() {
   useEffect(() => {
     if (code.length === 4) {
       if (code === CORRECT_CODE) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         playSuccess();
         setIsUnlocked(true);
         Animated.spring(unlockAnim, {
@@ -45,6 +51,7 @@ export default function LockScreen() {
         }).start();
       } else {
         setIsWrong(true);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         Vibration.vibrate(200);
         Animated.sequence([
           Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
@@ -61,6 +68,7 @@ export default function LockScreen() {
 
   const handleNumberPress = (num: string) => {
     if (code.length < 4 && !isUnlocked) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       playClick();
       setCode(prev => prev + num);
     }
@@ -68,6 +76,7 @@ export default function LockScreen() {
 
   const handleDelete = () => {
     if (code.length > 0 && !isUnlocked) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       playClick();
       setCode(prev => prev.slice(0, -1));
     }
@@ -81,8 +90,8 @@ export default function LockScreen() {
             key={i}
             style={[
               styles.dot,
-              code.length > i && styles.dotFilled,
-              isWrong && styles.dotError,
+              { borderColor: isWrong ? colors.error : colors.primary },
+              code.length > i && { backgroundColor: isWrong ? colors.error : colors.primary },
             ]}
           />
         ))}
@@ -94,45 +103,61 @@ export default function LockScreen() {
     return (
       <View style={styles.keypad}>
         <View style={styles.keypadRow}>
-          <TouchableOpacity style={styles.key} onPress={() => handleNumberPress('1')} activeOpacity={0.7} disabled={isUnlocked}>
-            <Text style={styles.keyText}>1</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.key} onPress={() => handleNumberPress('2')} activeOpacity={0.7} disabled={isUnlocked}>
-            <Text style={styles.keyText}>2</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.key} onPress={() => handleNumberPress('3')} activeOpacity={0.7} disabled={isUnlocked}>
-            <Text style={styles.keyText}>3</Text>
-          </TouchableOpacity>
+          {['1', '2', '3'].map((num) => (
+            <TouchableOpacity
+              key={num}
+              style={[styles.key, { backgroundColor: colors.card, borderColor: colors.border }]}
+              onPress={() => handleNumberPress(num)}
+              activeOpacity={0.7}
+              disabled={isUnlocked}
+            >
+              <Text style={[styles.keyText, { color: colors.textPrimary }]}>{num}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
         <View style={styles.keypadRow}>
-          <TouchableOpacity style={styles.key} onPress={() => handleNumberPress('4')} activeOpacity={0.7} disabled={isUnlocked}>
-            <Text style={styles.keyText}>4</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.key} onPress={() => handleNumberPress('5')} activeOpacity={0.7} disabled={isUnlocked}>
-            <Text style={styles.keyText}>5</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.key} onPress={() => handleNumberPress('6')} activeOpacity={0.7} disabled={isUnlocked}>
-            <Text style={styles.keyText}>6</Text>
-          </TouchableOpacity>
+          {['4', '5', '6'].map((num) => (
+            <TouchableOpacity
+              key={num}
+              style={[styles.key, { backgroundColor: colors.card, borderColor: colors.border }]}
+              onPress={() => handleNumberPress(num)}
+              activeOpacity={0.7}
+              disabled={isUnlocked}
+            >
+              <Text style={[styles.keyText, { color: colors.textPrimary }]}>{num}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
         <View style={styles.keypadRow}>
-          <TouchableOpacity style={styles.key} onPress={() => handleNumberPress('7')} activeOpacity={0.7} disabled={isUnlocked}>
-            <Text style={styles.keyText}>7</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.key} onPress={() => handleNumberPress('8')} activeOpacity={0.7} disabled={isUnlocked}>
-            <Text style={styles.keyText}>8</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.key} onPress={() => handleNumberPress('9')} activeOpacity={0.7} disabled={isUnlocked}>
-            <Text style={styles.keyText}>9</Text>
-          </TouchableOpacity>
+          {['7', '8', '9'].map((num) => (
+            <TouchableOpacity
+              key={num}
+              style={[styles.key, { backgroundColor: colors.card, borderColor: colors.border }]}
+              onPress={() => handleNumberPress(num)}
+              activeOpacity={0.7}
+              disabled={isUnlocked}
+            >
+              <Text style={[styles.keyText, { color: colors.textPrimary }]}>{num}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
         <View style={styles.keypadRow}>
           <View style={styles.keyEmpty} />
-          <TouchableOpacity style={styles.key} onPress={() => handleNumberPress('0')} activeOpacity={0.7} disabled={isUnlocked}>
-            <Text style={styles.keyText}>0</Text>
+          <TouchableOpacity
+            style={[styles.key, { backgroundColor: colors.card, borderColor: colors.border }]}
+            onPress={() => handleNumberPress('0')}
+            activeOpacity={0.7}
+            disabled={isUnlocked}
+          >
+            <Text style={[styles.keyText, { color: colors.textPrimary }]}>0</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.key} onPress={handleDelete} activeOpacity={0.7} disabled={isUnlocked}>
-            <Ionicons name="backspace-outline" size={28} color="#4A1942" />
+          <TouchableOpacity
+            style={[styles.key, { backgroundColor: colors.card, borderColor: colors.border }]}
+            onPress={handleDelete}
+            activeOpacity={0.7}
+            disabled={isUnlocked}
+          >
+            <Ionicons name="backspace-outline" size={28} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
       </View>
@@ -140,80 +165,93 @@ export default function LockScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Back Button */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => { playClick(); router.back(); }}
-        activeOpacity={0.7}
-      >
-        <Ionicons name="chevron-back" size={28} color="#FF6B9D" />
-      </TouchableOpacity>
+    <ThemedBackground showFloatingElements={false}>
+      <SafeAreaView style={styles.container}>
+        <TouchableOpacity
+          style={[styles.backButton, { backgroundColor: colors.card, borderColor: colors.border }]}
+          onPress={() => { playClick(); router.back(); }}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="chevron-back" size={24} color={colors.primary} />
+        </TouchableOpacity>
 
-      <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-        {!isUnlocked ? (
-          <>
-            <Ionicons name="lock-closed" size={60} color="#FF6B9D" />
-            <Text style={styles.title}>Secret Message 🔐</Text>
-            <Text style={styles.hint}>Hint: Our special day (MMDD)</Text>
-            
-            <Animated.View style={{ transform: [{ translateX: shakeAnim }] }}>
-              {renderDots()}
+        <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
+          {!isUnlocked ? (
+            <>
+              <View style={[styles.iconContainer, { backgroundColor: colors.primaryGlow }]}>
+                <Ionicons name="lock-closed" size={60} color={colors.primary} />
+              </View>
+              <Text style={[styles.title, { color: colors.textPrimary }]}>Secret Message 🔐</Text>
+              <Text style={[styles.hint, { color: colors.textMuted }]}>Hint: Our special day (MMDD)</Text>
+              
+              <Animated.View style={{ transform: [{ translateX: shakeAnim }] }}>
+                {renderDots()}
+              </Animated.View>
+              
+              {renderKeypad()}
+              
+              <TouchableOpacity
+                style={styles.skipButton}
+                onPress={() => { playClick(); router.push('/love-meter'); }}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.skipButtonText, { color: colors.textSecondary }]}>Skip</Text>
+                <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </>
+          ) : (
+            <Animated.View style={[styles.unlockedContainer, { opacity: unlockAnim, transform: [{ scale: unlockAnim }] }]}>
+              <View style={[styles.iconContainer, { backgroundColor: colors.successGlow }]}>
+                <Ionicons name="lock-open" size={60} color={colors.success} />
+              </View>
+              <Text style={[styles.unlockedTitle, { color: colors.success }]}>🎉 Unlocked! 🎉</Text>
+              
+              <ThemedCard variant="glow" glowColor={colors.primary}>
+                <View style={{ alignItems: 'center' }}>
+                  <Ionicons name="heart" size={30} color={colors.primary} />
+                  <Text style={[styles.secretText, { color: colors.textPrimary }]}>
+                    You remembered our day! 💕{"\n\n"}
+                    July 11 is when my life truly began —{"\n"}
+                    the day I got you.{"\n\n"}
+                    Every day since has been a gift.{"\n"}
+                    I love you, forever and always.
+                  </Text>
+                </View>
+              </ThemedCard>
+              
+              <TouchableOpacity
+                onPress={() => { playComplete(); router.push('/love-meter'); }}
+                activeOpacity={0.9}
+                style={{ marginTop: 24 }}
+              >
+                <LinearGradient
+                  colors={colors.gradientPrimary as any}
+                  style={[styles.button, { shadowColor: colors.primary }]}
+                >
+                  <Text style={styles.buttonText}>Continue</Text>
+                  <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
+                </LinearGradient>
+              </TouchableOpacity>
             </Animated.View>
-            
-            {renderKeypad()}
-            
-            <TouchableOpacity
-              style={styles.skipButton}
-              onPress={() => { playClick(); router.push('/love-meter'); }}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.skipButtonText}>Skip</Text>
-              <Ionicons name="chevron-forward" size={16} color="#9B7FA7" />
-            </TouchableOpacity>
-          </>
-        ) : (
-          <Animated.View style={[styles.unlockedContainer, { opacity: unlockAnim, transform: [{ scale: unlockAnim }] }]}>
-            <Ionicons name="lock-open" size={60} color="#4CAF50" />
-            <Text style={styles.unlockedTitle}>🎉 Unlocked! 🎉</Text>
-            
-            <View style={styles.secretMessage}>
-              <Ionicons name="heart" size={30} color="#FF6B9D" />
-              <Text style={styles.secretText}>
-                You remembered our day! 💕{"\n\n"}
-                July 11 is when my life truly began —{"\n"}
-                the day I got you.{"\n\n"}
-                Every day since has been a gift.{"\n"}
-                I love you, forever and always.
-              </Text>
-            </View>
-            
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => { playComplete(); router.push('/love-meter'); }}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.buttonText}>Continue</Text>
-              <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
-            </TouchableOpacity>
-          </Animated.View>
-        )}
-      </Animated.View>
-    </SafeAreaView>
+          )}
+        </Animated.View>
+      </SafeAreaView>
+    </ThemedBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF5F7',
   },
   backButton: {
     position: 'absolute',
     top: 50,
     left: 16,
     zIndex: 10,
-    padding: 8,
+    padding: 10,
+    borderRadius: 20,
+    borderWidth: 1,
   },
   content: {
     flex: 1,
@@ -221,16 +259,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
+  iconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   title: {
     fontSize: 28,
     fontWeight: '600',
-    color: '#4A1942',
-    marginTop: 16,
     marginBottom: 8,
   },
   hint: {
     fontSize: 14,
-    color: '#9B7FA7',
     marginBottom: 30,
     fontStyle: 'italic',
   },
@@ -244,15 +287,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#FF6B9D',
     backgroundColor: 'transparent',
-  },
-  dotFilled: {
-    backgroundColor: '#FF6B9D',
-  },
-  dotError: {
-    borderColor: '#E53935',
-    backgroundColor: '#E53935',
   },
   keypad: {
     alignItems: 'center',
@@ -268,14 +303,9 @@ const styles = StyleSheet.create({
     width: 75,
     height: 75,
     borderRadius: 40,
-    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
   },
   keyEmpty: {
     width: 75,
@@ -285,7 +315,6 @@ const styles = StyleSheet.create({
   keyText: {
     fontSize: 32,
     fontWeight: '500',
-    color: '#4A1942',
   },
   unlockedContainer: {
     alignItems: 'center',
@@ -294,37 +323,25 @@ const styles = StyleSheet.create({
   unlockedTitle: {
     fontSize: 28,
     fontWeight: '600',
-    color: '#4CAF50',
-    marginTop: 16,
     marginBottom: 20,
-  },
-  secretMessage: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 24,
-    alignItems: 'center',
-    marginBottom: 30,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
   },
   secretText: {
     fontSize: 16,
     lineHeight: 26,
-    color: '#4A1942',
     textAlign: 'center',
     marginTop: 16,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FF6B9D',
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 25,
     gap: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 8,
   },
   buttonText: {
     color: '#FFFFFF',
@@ -341,7 +358,6 @@ const styles = StyleSheet.create({
   },
   skipButtonText: {
     fontSize: 14,
-    color: '#9B7FA7',
     fontWeight: '500',
   },
 });
