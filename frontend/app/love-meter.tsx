@@ -10,13 +10,18 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import Slider from '@react-native-community/slider';
 import { useAudio } from './_layout';
+import { useTheme } from './theme/ThemeContext';
+import { ThemedBackground, ThemedCard } from './components/themed';
+import * as Haptics from 'expo-haptics';
 
 const { width } = Dimensions.get('window');
 
 export default function LoveMeter() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
   const { playClick, playSuccess, playComplete } = useAudio();
   const [sliderValue, setSliderValue] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
@@ -25,6 +30,7 @@ export default function LoveMeter() {
   const fillAnim = useRef(new Animated.Value(0)).current;
   const messageAnim = useRef(new Animated.Value(0)).current;
   const heartPulse = useRef(new Animated.Value(1)).current;
+  const glowAnim = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -33,7 +39,6 @@ export default function LoveMeter() {
       useNativeDriver: true,
     }).start();
 
-    // Heart pulse animation
     Animated.loop(
       Animated.sequence([
         Animated.timing(heartPulse, {
@@ -48,6 +53,21 @@ export default function LoveMeter() {
         }),
       ])
     ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowAnim, {
+          toValue: 0.6,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(glowAnim, {
+          toValue: 0.3,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
   }, []);
 
   const handleSliderChange = (value: number) => {
@@ -58,8 +78,8 @@ export default function LoveMeter() {
   };
 
   const handleSliderComplete = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     playSuccess();
-    // Always fill to 100% no matter where they slide
     Animated.timing(fillAnim, {
       toValue: 100,
       duration: 1000,
@@ -75,122 +95,125 @@ export default function LoveMeter() {
     });
   };
 
-  const displayValue = fillAnim.interpolate({
-    inputRange: [0, 100],
-    outputRange: [0, 100],
-  });
-
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Back Button */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => { playClick(); router.back(); }}
-        activeOpacity={0.7}
-      >
-        <Ionicons name="chevron-back" size={28} color="#FF6B9D" />
-      </TouchableOpacity>
+    <ThemedBackground>
+      <SafeAreaView style={styles.container}>
+        <TouchableOpacity
+          style={[styles.backButton, { backgroundColor: colors.card, borderColor: colors.border }]}
+          onPress={() => { playClick(); router.back(); }}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="chevron-back" size={24} color={colors.primary} />
+        </TouchableOpacity>
 
-      <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-        <Animated.View style={{ transform: [{ scale: heartPulse }] }}>
-          <Ionicons name="heart" size={80} color="#FF6B9D" />
-        </Animated.View>
-        
-        <Text style={styles.title}>Love Meter 💕</Text>
-        <Text style={styles.subtitle}>How much do I love you?</Text>
-        
-        {/* Love Meter Display */}
-        <View style={styles.meterContainer}>
-          <View style={styles.meterBackground}>
-            <Animated.View 
-              style={[
-                styles.meterFill,
-                { 
-                  width: hasInteracted 
-                    ? fillAnim.interpolate({
-                        inputRange: [0, 100],
-                        outputRange: ['0%', '100%'],
-                      })
-                    : `${sliderValue}%`
-                }
-              ]} 
-            />
-          </View>
-          <Text style={styles.meterValue}>
-            {hasInteracted && showMessage ? '100' : Math.round(sliderValue)}%
-          </Text>
-        </View>
-        
-        {/* Slider */}
-        {!showMessage && (
-          <View style={styles.sliderContainer}>
-            <Text style={styles.sliderLabel}>Slide to measure</Text>
-            <Slider
-              style={styles.slider}
-              minimumValue={0}
-              maximumValue={100}
-              value={sliderValue}
-              onValueChange={handleSliderChange}
-              onSlidingComplete={handleSliderComplete}
-              minimumTrackTintColor="#FF6B9D"
-              maximumTrackTintColor="#FFD6E6"
-              thumbTintColor="#FF6B9D"
-            />
-          </View>
-        )}
-        
-        {/* Message */}
-        {showMessage && (
-          <Animated.View style={[styles.messageContainer, { opacity: messageAnim, transform: [{ scale: messageAnim }] }]}>
-            <View style={styles.brokenBadge}>
-              <Ionicons name="construct" size={24} color="#FF6B9D" />
-              <Text style={styles.brokenText}>BROKEN</Text>
+        <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
+          <Animated.View style={[styles.heartContainer, { transform: [{ scale: heartPulse }] }]}>
+            <Animated.View style={[styles.heartGlow, { backgroundColor: colors.primaryGlow, opacity: glowAnim }]} />
+            <Ionicons name="heart" size={80} color={colors.primary} />
+          </Animated.View>
+          
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Love Meter 💕</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>How much do I love you?</Text>
+          
+          <View style={styles.meterContainer}>
+            <View style={[styles.meterBackground, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <Animated.View 
+                style={[
+                  styles.meterFill,
+                  { 
+                    backgroundColor: colors.primary,
+                    width: hasInteracted 
+                      ? fillAnim.interpolate({
+                          inputRange: [0, 100],
+                          outputRange: ['0%', '100%'],
+                        })
+                      : `${sliderValue}%`
+                  }
+                ]} 
+              />
             </View>
-            <Text style={styles.messageText}>
-              Sorry, it's broken...{"\n"}
-              It only shows 100% 💕
+            <Text style={[styles.meterValue, { color: colors.primary }]}>
+              {hasInteracted && showMessage ? '100' : Math.round(sliderValue)}%
             </Text>
-            <Text style={styles.subMessage}>
-              No matter what, my love for you is always at maximum.
-            </Text>
-            
+          </View>
+          
+          {!showMessage && (
+            <View style={styles.sliderContainer}>
+              <Text style={[styles.sliderLabel, { color: colors.textMuted }]}>Slide to measure</Text>
+              <Slider
+                style={styles.slider}
+                minimumValue={0}
+                maximumValue={100}
+                value={sliderValue}
+                onValueChange={handleSliderChange}
+                onSlidingComplete={handleSliderComplete}
+                minimumTrackTintColor={colors.primary}
+                maximumTrackTintColor={colors.border}
+                thumbTintColor={colors.primary}
+              />
+            </View>
+          )}
+          
+          {showMessage && (
+            <Animated.View style={[styles.messageContainer, { opacity: messageAnim, transform: [{ scale: messageAnim }] }]}>
+              <ThemedCard variant="glow" glowColor={colors.primary}>
+                <View style={[styles.brokenBadge, { backgroundColor: colors.primaryGlow }]}>
+                  <Ionicons name="construct" size={24} color={colors.primary} />
+                  <Text style={[styles.brokenText, { color: colors.primary }]}>BROKEN</Text>
+                </View>
+                <Text style={[styles.messageText, { color: colors.textPrimary }]}>
+                  Sorry, it's broken...{"\n"}
+                  It only shows 100% 💕
+                </Text>
+                <Text style={[styles.subMessage, { color: colors.textSecondary }]}>
+                  No matter what, my love for you is always at maximum.
+                </Text>
+              </ThemedCard>
+              
+              <TouchableOpacity
+                onPress={() => { playComplete(); router.push('/hold-reveal'); }}
+                activeOpacity={0.9}
+                style={styles.buttonWrapper}
+              >
+                <LinearGradient
+                  colors={colors.gradientPrimary as any}
+                  style={[styles.button, { shadowColor: colors.primary }]}
+                >
+                  <Text style={styles.buttonText}>Continue</Text>
+                  <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
+                </LinearGradient>
+              </TouchableOpacity>
+            </Animated.View>
+          )}
+          
+          {!showMessage && (
             <TouchableOpacity
-              style={styles.button}
-              onPress={() => { playComplete(); router.push('/hold-reveal'); }}
+              style={styles.skipButton}
+              onPress={() => { playClick(); router.push('/hold-reveal'); }}
               activeOpacity={0.8}
             >
-              <Text style={styles.buttonText}>Continue</Text>
-              <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
+              <Text style={[styles.skipButtonText, { color: colors.textSecondary }]}>Skip</Text>
+              <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
             </TouchableOpacity>
-          </Animated.View>
-        )}
-        
-        {!showMessage && (
-          <TouchableOpacity
-            style={styles.skipButton}
-            onPress={() => { playClick(); router.push('/hold-reveal'); }}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.skipButtonText}>Skip</Text>
-            <Ionicons name="chevron-forward" size={16} color="#9B7FA7" />
-          </TouchableOpacity>
-        )}
-      </Animated.View>
-    </SafeAreaView>
+          )}
+        </Animated.View>
+      </SafeAreaView>
+    </ThemedBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF5F7',
   },
   backButton: {
     position: 'absolute',
     top: 50,
     left: 16,
     zIndex: 10,
-    padding: 8,
+    padding: 10,
+    borderRadius: 20,
+    borderWidth: 1,
   },
   content: {
     flex: 1,
@@ -198,16 +221,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
+  heartContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  heartGlow: {
+    position: 'absolute',
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+  },
   title: {
     fontSize: 32,
     fontWeight: '600',
-    color: '#4A1942',
     marginTop: 20,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 18,
-    color: '#9B7FA7',
     marginBottom: 40,
   },
   meterContainer: {
@@ -218,19 +249,17 @@ const styles = StyleSheet.create({
   meterBackground: {
     width: '100%',
     height: 40,
-    backgroundColor: '#FFD6E6',
     borderRadius: 20,
     overflow: 'hidden',
+    borderWidth: 1,
   },
   meterFill: {
     height: '100%',
-    backgroundColor: '#FF6B9D',
     borderRadius: 20,
   },
   meterValue: {
     fontSize: 48,
     fontWeight: '700',
-    color: '#FF6B9D',
     marginTop: 16,
   },
   sliderContainer: {
@@ -239,7 +268,6 @@ const styles = StyleSheet.create({
   },
   sliderLabel: {
     fontSize: 14,
-    color: '#9B7FA7',
     marginBottom: 10,
   },
   slider: {
@@ -249,11 +277,12 @@ const styles = StyleSheet.create({
   messageContainer: {
     alignItems: 'center',
     padding: 20,
+    width: '100%',
   },
   brokenBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF0F5',
+    alignSelf: 'center',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
@@ -263,31 +292,33 @@ const styles = StyleSheet.create({
   brokenText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#FF6B9D',
     letterSpacing: 2,
   },
   messageText: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#4A1942',
     textAlign: 'center',
     marginBottom: 12,
   },
   subMessage: {
     fontSize: 16,
-    color: '#9B7FA7',
     textAlign: 'center',
-    marginBottom: 30,
     fontStyle: 'italic',
+  },
+  buttonWrapper: {
+    marginTop: 24,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FF6B9D',
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 25,
     gap: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 8,
   },
   buttonText: {
     color: '#FFFFFF',
@@ -304,7 +335,6 @@ const styles = StyleSheet.create({
   },
   skipButtonText: {
     fontSize: 14,
-    color: '#9B7FA7',
     fontWeight: '500',
   },
 });

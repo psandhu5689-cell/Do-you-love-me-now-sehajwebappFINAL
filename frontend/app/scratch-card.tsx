@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,11 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAudio } from './_layout';
+import { useTheme } from './theme/ThemeContext';
+import { ThemedBackground, ThemedCard } from './components/themed';
+import * as Haptics from 'expo-haptics';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 80;
@@ -26,6 +30,7 @@ const LOVE_MESSAGES = [
 
 export default function ScratchCard() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
   const { playClick, playSuccess, playComplete } = useAudio();
   const [scratchProgress, setScratchProgress] = useState(0);
   const [isRevealed, setIsRevealed] = useState(false);
@@ -34,7 +39,7 @@ export default function ScratchCard() {
   const revealAnim = useRef(new Animated.Value(0)).current;
   const scratchedAreas = useRef(new Set<string>());
 
-  React.useEffect(() => {
+  useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 800,
@@ -54,6 +59,7 @@ export default function ScratchCard() {
       setScratchProgress(progress);
       
       if (progress > 40 && !isRevealed) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         playSuccess();
         setIsRevealed(true);
         Animated.spring(revealAnim, {
@@ -79,119 +85,127 @@ export default function ScratchCard() {
   ).current;
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Back Button */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => { playClick(); router.back(); }}
-        activeOpacity={0.7}
-      >
-        <Ionicons name="chevron-back" size={28} color="#FF6B9D" />
-      </TouchableOpacity>
+    <ThemedBackground>
+      <SafeAreaView style={styles.container}>
+        <TouchableOpacity
+          style={[styles.backButton, { backgroundColor: colors.card, borderColor: colors.border }]}
+          onPress={() => { playClick(); router.back(); }}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="chevron-back" size={24} color={colors.primary} />
+        </TouchableOpacity>
 
-      <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-        <Ionicons name="gift" size={50} color="#FF6B9D" />
-        <Text style={styles.title}>Scratch to Reveal 💕</Text>
-        <Text style={styles.subtitle}>Scratch the card to see your message!</Text>
-        
-        <View style={styles.cardContainer}>
-          {/* Hidden Message Layer */}
-          <View style={styles.messageLayer}>
-            <Ionicons name="heart" size={40} color="#FFD6E6" />
-            <Text style={styles.messageText}>{message}</Text>
-            <Text style={styles.signature}>— With all my love 💕</Text>
+        <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
+          <View style={[styles.iconContainer, { backgroundColor: colors.primaryGlow }]}>
+            <Ionicons name="gift" size={50} color={colors.primary} />
+          </View>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Scratch to Reveal 💕</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Scratch the card to see your message!</Text>
+          
+          <View style={[styles.cardContainer, { borderColor: colors.border }]}>
+            <View style={[styles.messageLayer, { backgroundColor: colors.card }]}>
+              <Ionicons name="heart" size={40} color={colors.primaryLight} />
+              <Text style={[styles.messageText, { color: colors.textPrimary }]}>{message}</Text>
+              <Text style={[styles.signature, { color: colors.primary }]}>— With all my love 💕</Text>
+            </View>
+            
+            {!isRevealed && (
+              <LinearGradient
+                colors={colors.gradientPrimary as any}
+                style={styles.scratchLayer}
+                {...panResponder.panHandlers}
+              >
+                <View style={styles.scratchContent}>
+                  <Ionicons name="finger-print" size={60} color="rgba(255,255,255,0.9)" />
+                  <Text style={styles.scratchText}>Scratch here!</Text>
+                  <Text style={styles.progressText}>{Math.round(scratchProgress)}% revealed</Text>
+                </View>
+              </LinearGradient>
+            )}
           </View>
           
-          {/* Scratch Layer */}
-          {!isRevealed && (
-            <View
-              style={styles.scratchLayer}
-              {...panResponder.panHandlers}
-            >
-              <View style={styles.scratchContent}>
-                <Ionicons name="finger-print" size={60} color="#FFFFFF" />
-                <Text style={styles.scratchText}>Scratch here!</Text>
-                <Text style={styles.progressText}>{Math.round(scratchProgress)}% revealed</Text>
-              </View>
-            </View>
+          {isRevealed && (
+            <Animated.View style={[styles.revealedContainer, { opacity: revealAnim, transform: [{ scale: revealAnim }] }]}>
+              <Text style={[styles.revealedTitle, { color: colors.primary }]}>✨ Message Revealed! ✨</Text>
+              <TouchableOpacity
+                onPress={() => { playComplete(); router.push('/lock-screen'); }}
+                activeOpacity={0.9}
+              >
+                <LinearGradient
+                  colors={colors.gradientPrimary as any}
+                  style={[styles.button, { shadowColor: colors.primary }]}
+                >
+                  <Text style={styles.buttonText}>Continue</Text>
+                  <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
+                </LinearGradient>
+              </TouchableOpacity>
+            </Animated.View>
           )}
-        </View>
-        
-        {isRevealed && (
-          <Animated.View style={[styles.revealedContainer, { opacity: revealAnim, transform: [{ scale: revealAnim }] }]}>
-            <Text style={styles.revealedTitle}>✨ Message Revealed! ✨</Text>
+          
+          {!isRevealed && (
             <TouchableOpacity
-              style={styles.button}
-              onPress={() => { playComplete(); router.push('/lock-screen'); }}
+              style={styles.skipButton}
+              onPress={() => { playClick(); router.push('/lock-screen'); }}
               activeOpacity={0.8}
             >
-              <Text style={styles.buttonText}>Continue</Text>
-              <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
+              <Text style={[styles.skipButtonText, { color: colors.textSecondary }]}>Skip</Text>
+              <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
             </TouchableOpacity>
-          </Animated.View>
-        )}
-        
-        {!isRevealed && (
-          <TouchableOpacity
-            style={styles.skipButton}
-            onPress={() => { playClick(); router.push('/lock-screen'); }}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.skipButtonText}>Skip</Text>
-            <Ionicons name="chevron-forward" size={16} color="#9B7FA7" />
-          </TouchableOpacity>
-        )}
-      </Animated.View>
-    </SafeAreaView>
+          )}
+        </Animated.View>
+      </SafeAreaView>
+    </ThemedBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF5F7',
   },
   backButton: {
     position: 'absolute',
     top: 50,
     left: 16,
     zIndex: 10,
-    padding: 8,
+    padding: 10,
+    borderRadius: 20,
+    borderWidth: 1,
   },
   content: {
     flex: 1,
     padding: 20,
+    paddingTop: 80,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  iconContainer: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
   },
   title: {
     fontSize: 28,
     fontWeight: '600',
-    color: '#4A1942',
-    marginTop: 16,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#9B7FA7',
     marginBottom: 30,
   },
   cardContainer: {
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
-    borderRadius: 20,
+    borderRadius: 24,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 10,
+    borderWidth: 1,
   },
   messageLayer: {
     position: 'absolute',
     width: '100%',
     height: '100%',
-    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -199,7 +213,6 @@ const styles = StyleSheet.create({
   messageText: {
     fontSize: 18,
     fontWeight: '500',
-    color: '#4A1942',
     textAlign: 'center',
     marginTop: 16,
     lineHeight: 28,
@@ -207,7 +220,6 @@ const styles = StyleSheet.create({
   },
   signature: {
     fontSize: 14,
-    color: '#FF6B9D',
     marginTop: 16,
     fontWeight: '600',
   },
@@ -215,7 +227,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%',
-    backgroundColor: '#FF6B9D',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -240,17 +251,19 @@ const styles = StyleSheet.create({
   revealedTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#FF6B9D',
     marginBottom: 20,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FF6B9D',
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 25,
     gap: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 8,
   },
   buttonText: {
     color: '#FFFFFF',
@@ -267,7 +280,6 @@ const styles = StyleSheet.create({
   },
   skipButtonText: {
     fontSize: 14,
-    color: '#9B7FA7',
     fontWeight: '500',
   },
 });

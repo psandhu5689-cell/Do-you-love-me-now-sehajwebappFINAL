@@ -11,12 +11,15 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAudio } from './_layout';
+import { useTheme } from './theme/ThemeContext';
+import { ThemedBackground } from './components/themed';
+import * as Haptics from 'expo-haptics';
 
 const { width } = Dimensions.get('window');
 const CARD_SIZE = (width - 60) / 4;
 
-// Photos from user
 const PHOTOS = [
   'https://customer-assets.emergentagent.com/job_sehaj-love/artifacts/c4js402r_IMG_2322.jpeg',
   'https://customer-assets.emergentagent.com/job_sehaj-love/artifacts/f4wz0r37_IMG_2420.jpeg',
@@ -42,6 +45,7 @@ interface Card {
 
 export default function CardMatch() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
   const { playClick, playSuccess, playComplete } = useAudio();
   const [cards, setCards] = useState<Card[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
@@ -63,6 +67,7 @@ export default function CardMatch() {
 
   useEffect(() => {
     if (isComplete) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       playComplete();
       Animated.spring(celebrateAnim, {
         toValue: 1,
@@ -95,7 +100,6 @@ export default function CardMatch() {
       });
     }
     
-    // Shuffle
     for (let i = cardPairs.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [cardPairs[i], cardPairs[j]] = [cardPairs[j], cardPairs[i]];
@@ -110,6 +114,7 @@ export default function CardMatch() {
     const card = cards.find(c => c.id === cardId);
     if (!card || card.isFlipped || card.isMatched) return;
     
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     playClick();
     
     const newCards = cards.map(c => 
@@ -145,110 +150,115 @@ export default function CardMatch() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Back Button */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => { playClick(); router.back(); }}
-        activeOpacity={0.7}
-      >
-        <Ionicons name="chevron-back" size={28} color="#FF6B9D" />
-      </TouchableOpacity>
+    <ThemedBackground>
+      <SafeAreaView style={styles.container}>
+        <TouchableOpacity
+          style={[styles.backButton, { backgroundColor: colors.card, borderColor: colors.border }]}
+          onPress={() => { playClick(); router.back(); }}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="chevron-back" size={24} color={colors.primary} />
+        </TouchableOpacity>
 
-      <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-        <Text style={styles.title}>Match the Pairs 💕</Text>
-        <Text style={styles.subtitle}>Find each photo with its caption!</Text>
-        
-        <Text style={styles.progress}>{matches} / 4 matched</Text>
-        
-        <View style={styles.grid}>
-          {cards.map((card) => (
-            <TouchableOpacity
-              key={card.id}
-              style={[
-                styles.card,
-                card.isFlipped && styles.cardFlipped,
-                card.isMatched && styles.cardMatched,
-              ]}
-              onPress={() => handleCardPress(card.id)}
-              activeOpacity={0.8}
-              disabled={card.isMatched}
-            >
-              {card.isFlipped || card.isMatched ? (
-                card.type === 'photo' ? (
-                  <Image source={{ uri: card.content }} style={styles.cardImage} />
+        <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Match the Pairs 💕</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Find each photo with its caption!</Text>
+          
+          <Text style={[styles.progress, { color: colors.primary }]}>{matches} / 4 matched</Text>
+          
+          <View style={styles.grid}>
+            {cards.map((card) => (
+              <TouchableOpacity
+                key={card.id}
+                style={[
+                  styles.card,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                  card.isFlipped && { backgroundColor: colors.primaryGlow, borderColor: colors.primary },
+                  card.isMatched && { backgroundColor: isDark ? 'rgba(74, 222, 128, 0.15)' : '#E8F5E9', borderColor: colors.success },
+                ]}
+                onPress={() => handleCardPress(card.id)}
+                activeOpacity={0.8}
+                disabled={card.isMatched}
+              >
+                {card.isFlipped || card.isMatched ? (
+                  card.type === 'photo' ? (
+                    <Image source={{ uri: card.content }} style={styles.cardImage} />
+                  ) : (
+                    <Text style={[styles.cardText, { color: colors.textPrimary }]}>{card.content}</Text>
+                  )
                 ) : (
-                  <Text style={styles.cardText}>{card.content}</Text>
-                )
-              ) : (
-                <Ionicons name="heart" size={30} color="#FF6B9D" />
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
-        
-        {isComplete && (
-          <Animated.View style={[styles.completeContainer, { opacity: celebrateAnim, transform: [{ scale: celebrateAnim }] }]}>
-            <Ionicons name="heart" size={50} color="#FF6B9D" />
-            <Text style={styles.completeTitle}>Perfect Match! 🎉</Text>
-            <Text style={styles.completeText}>Just like us 💕</Text>
+                  <Ionicons name="heart" size={30} color={colors.primary} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+          
+          {isComplete && (
+            <Animated.View style={[styles.completeContainer, { opacity: celebrateAnim, transform: [{ scale: celebrateAnim }] }]}>
+              <Ionicons name="heart" size={50} color={colors.primary} />
+              <Text style={[styles.completeTitle, { color: colors.textPrimary }]}>Perfect Match! 🎉</Text>
+              <Text style={[styles.completeText, { color: colors.textSecondary }]}>Just like us 💕</Text>
+              <TouchableOpacity
+                onPress={() => { playClick(); router.push('/scratch-card'); }}
+                activeOpacity={0.9}
+              >
+                <LinearGradient
+                  colors={colors.gradientPrimary as any}
+                  style={[styles.button, { shadowColor: colors.primary }]}
+                >
+                  <Text style={styles.buttonText}>Continue</Text>
+                  <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
+                </LinearGradient>
+              </TouchableOpacity>
+            </Animated.View>
+          )}
+          
+          {!isComplete && (
             <TouchableOpacity
-              style={styles.button}
+              style={styles.skipButton}
               onPress={() => { playClick(); router.push('/scratch-card'); }}
               activeOpacity={0.8}
             >
-              <Text style={styles.buttonText}>Continue</Text>
-              <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
+              <Text style={[styles.skipButtonText, { color: colors.textSecondary }]}>Skip</Text>
+              <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
             </TouchableOpacity>
-          </Animated.View>
-        )}
-        
-        {!isComplete && (
-          <TouchableOpacity
-            style={styles.skipButton}
-            onPress={() => { playClick(); router.push('/scratch-card'); }}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.skipButtonText}>Skip</Text>
-            <Ionicons name="chevron-forward" size={16} color="#9B7FA7" />
-          </TouchableOpacity>
-        )}
-      </Animated.View>
-    </SafeAreaView>
+          )}
+        </Animated.View>
+      </SafeAreaView>
+    </ThemedBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF5F7',
   },
   backButton: {
     position: 'absolute',
     top: 50,
     left: 16,
     zIndex: 10,
-    padding: 8,
+    padding: 10,
+    borderRadius: 20,
+    borderWidth: 1,
   },
   content: {
     flex: 1,
     padding: 20,
+    paddingTop: 80,
     alignItems: 'center',
   },
   title: {
     fontSize: 28,
     fontWeight: '600',
-    color: '#4A1942',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#9B7FA7',
     marginBottom: 16,
   },
   progress: {
     fontSize: 18,
-    color: '#FF6B9D',
     fontWeight: '600',
     marginBottom: 20,
   },
@@ -262,35 +272,19 @@ const styles = StyleSheet.create({
   card: {
     width: CARD_SIZE,
     height: CARD_SIZE,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#FFD6E6',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  cardFlipped: {
-    backgroundColor: '#FFF0F5',
-    borderColor: '#FF6B9D',
-  },
-  cardMatched: {
-    backgroundColor: '#E8F5E9',
-    borderColor: '#4CAF50',
   },
   cardImage: {
     width: CARD_SIZE - 16,
     height: CARD_SIZE - 16,
-    borderRadius: 8,
+    borderRadius: 10,
   },
   cardText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#4A1942',
     textAlign: 'center',
     padding: 4,
   },
@@ -301,22 +295,23 @@ const styles = StyleSheet.create({
   completeTitle: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#4A1942',
     marginTop: 12,
   },
   completeText: {
     fontSize: 16,
-    color: '#9B7FA7',
     marginBottom: 20,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FF6B9D',
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 25,
     gap: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 8,
   },
   buttonText: {
     color: '#FFFFFF',
@@ -333,7 +328,6 @@ const styles = StyleSheet.create({
   },
   skipButtonText: {
     fontSize: 14,
-    color: '#9B7FA7',
     fontWeight: '500',
   },
 });
