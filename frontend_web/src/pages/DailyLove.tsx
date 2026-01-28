@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { IoChevronBack, IoSparkles, IoHeart, IoFlash, IoCamera, IoRefresh, IoClose, IoHeartHalf, IoChatbubbles, IoHelpCircle, IoChevronForward, IoFlame, IoSunny, IoGift } from 'react-icons/io5'
+import { motion, AnimatePresence } from 'framer-motion'
+import { IoChevronBack, IoSparkles, IoHeart, IoFlash, IoCamera, IoRefresh, IoClose, IoHeartHalf, IoChatbubbles, IoHelpCircle, IoChevronForward, IoFlame, IoSunny, IoGift, IoPlay, IoPause, IoPlaySkipForward, IoPlaySkipBack, IoVolumeHigh, IoVolumeMute } from 'react-icons/io5'
 import { useTheme } from '../context/ThemeContext'
 import { useAudio } from '../context/AudioContext'
+import { useMusic, PLAYLIST } from '../context/MusicContext'
 
 // ============ CONTENT ARRAYS ============
 
