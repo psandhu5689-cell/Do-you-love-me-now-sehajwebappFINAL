@@ -249,7 +249,7 @@ export default function Gallery() {
             {item.title}
           </Text>
           <Text style={[styles.tileSong, { color: colors.textMuted }]} numberOfLines={1}>
-            🎵 {item.song.title}
+            🎵 {item.song.title} - {item.song.artist}
           </Text>
         </View>
       </TouchableOpacity>
