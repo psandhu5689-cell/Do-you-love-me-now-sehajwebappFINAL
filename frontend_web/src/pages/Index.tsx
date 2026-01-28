@@ -340,6 +340,9 @@ export default function Index() {
           </span>
           <span>💕</span>
         </motion.button>
+
+        {/* Presence Display */}
+        <PresenceDisplay style={{ marginTop: 24 }} />
       </motion.div>
     </div>
   )
