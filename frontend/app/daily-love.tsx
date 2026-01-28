@@ -201,7 +201,6 @@ const SAD_MESSAGES = [
 const CATEGORIES = [
   { id: 'compliment', title: 'Compliments', icon: 'sparkles', color: '#FF6B9D', data: COMPLIMENTS, emoji: '💫' },
   { id: 'love', title: 'Why I Love You', icon: 'heart', color: '#E91E63', data: WHY_I_LOVE_YOU, emoji: '❤️' },
-  { id: 'question', title: 'Questions', icon: 'help-circle', color: '#9C27B0', data: QUESTIONS, hasInput: true, emoji: '💬' },
   { id: 'challenge', title: 'Challenges', icon: 'flash', color: '#FF9800', data: CHALLENGES, emoji: '⚡' },
   { id: 'moment', title: 'Memories', icon: 'camera', color: '#4CAF50', data: SPECIAL_MOMENTS, emoji: '📸' },
 ];
@@ -433,9 +432,7 @@ export default function DailyLove() {
               onPress={getNextContent}
               activeOpacity={0.8}
             >
-              <Text style={styles.nextButtonText}>
-                Next {selectedCategory.id === 'moment' ? 'Memory' : selectedCategory.title.slice(0, -1)}
-              </Text>
+              <Text style={styles.nextButtonText}>Next</Text>
               <Ionicons name="refresh" size={20} color="#FFFFFF" />
             </TouchableOpacity>
           </ScrollView>
