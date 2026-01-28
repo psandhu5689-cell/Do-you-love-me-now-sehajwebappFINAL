@@ -52,7 +52,7 @@ export default function TryNotToSmile() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: colors.background,
+      background: 'transparent',
       display: 'flex',
       flexDirection: 'column',
       position: 'relative',
