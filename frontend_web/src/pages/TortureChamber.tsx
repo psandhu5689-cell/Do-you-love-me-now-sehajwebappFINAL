@@ -40,8 +40,8 @@ export default function TortureChamber() {
   const navigate = useNavigate()
   const { colors } = useTheme()
   const { playClick, playPop } = useAudio()
-  const [hp, setHp] = useState(100)
-  const [maxHp] = useState(100)
+  const [hp, setHp] = useState(1500)
+  const [maxHp] = useState(1500)
   const [currentMessage, setCurrentMessage] = useState('')
   const [floatingDamage, setFloatingDamage] = useState<{ value: number; isHeal: boolean } | null>(null)
   const [isShaking, setIsShaking] = useState(false)
@@ -51,18 +51,18 @@ export default function TortureChamber() {
 
   // Get status based on HP
   const getStatus = () => {
-    if (hp > 100) return "tooooo much love...."
-    if (hp > 70) return "Vibing."
-    if (hp > 40) return "Concerned."
-    if (hp > 15) return "Regretting life choices."
+    if (hp > 1500) return "tooooo much love...."
+    if (hp > 1050) return "Vibing."  // 70%
+    if (hp > 600) return "Concerned."  // 40%
+    if (hp > 225) return "Regretting life choices."  // 15%
     return "On life support."
   }
 
   // Get HP bar color
   const getHpColor = () => {
-    if (hp > 100) return '#ff69b4' // Pink for overheal
-    if (hp > 60) return '#4ade80' // Green
-    if (hp > 30) return '#fbbf24' // Yellow
+    if (hp > 1500) return '#ff69b4' // Pink for overheal
+    if (hp > 900) return '#4ade80' // Green (60%)
+    if (hp > 450) return '#fbbf24' // Yellow (30%)
     return '#ef4444' // Red
   }
 
@@ -93,7 +93,7 @@ export default function TortureChamber() {
       setTimeout(() => {
         setShowJustKidding(true)
         setTimeout(() => {
-          setHp(30)
+          setHp(450)  // Revive to 30% of 1500
           setIsDead(false)
           setShowJustKidding(false)
           setCurrentMessage("im immortal unfortunately.")
@@ -114,7 +114,7 @@ export default function TortureChamber() {
       setCurrentMessage(action.message)
     }
 
-    const newHp = Math.min(120, hp + action.heal) // Cap at 120
+    const newHp = Math.min(1800, hp + action.heal) // Cap at 1800 (120% of 1500)
     setHp(newHp)
 
     // Show floating heal
@@ -125,7 +125,7 @@ export default function TortureChamber() {
   // Revive button
   const handleRevive = () => {
     playClick()
-    setHp(100)
+    setHp(1500)
     setCurrentMessage("Sehaj forgives you.")
     setWasJustDamaged(false)
   }
