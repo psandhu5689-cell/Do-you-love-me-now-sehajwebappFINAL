@@ -117,12 +117,6 @@ export default function Hub() {
     ).start();
   };
 
-  useEffect(() => {
-    if (!showPresenceCheck) {
-      startAnimations();
-    }
-  }, [showPresenceCheck]);
-
   const heartTranslateY = heartAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [0, -15],
