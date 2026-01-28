@@ -179,6 +179,12 @@ export default function EntryGate() {
     router.push('/first-intro');
   };
 
+  const handleGallery = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    playClick();
+    router.push('/gallery');
+  };
+
   // Show nothing while checking intro
   if (checkingIntro) {
     return (
