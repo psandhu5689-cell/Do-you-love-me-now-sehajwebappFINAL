@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { IoHeart, IoSparkles, IoImages } from 'react-icons/io5'
+import { IoHeart, IoSparkles, IoImages, IoSkull } from 'react-icons/io5'
 import { useTheme } from '../context/ThemeContext'
 import { useAudio } from '../context/AudioContext'
 
@@ -69,6 +69,11 @@ export default function Index() {
   const handleGallery = () => {
     playClick()
     navigate('/gallery')
+  }
+
+  const handleTryNotToSmile = () => {
+    playClick()
+    navigate('/try-not-to-smile')
   }
 
   if (checkingIntro) {
@@ -189,6 +194,29 @@ export default function Index() {
         <span style={{ color: colors.secondary, fontSize: 13, fontWeight: 600 }}>Gallery</span>
       </motion.button>
 
+      {/* Try Not to Smile Button */}
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={handleTryNotToSmile}
+        style={{
+          position: 'absolute',
+          top: 60,
+          left: 168,
+          padding: '10px 14px',
+          background: 'rgba(168, 85, 247, 0.15)',
+          borderRadius: 20,
+          border: 'none',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+        }}
+      >
+        <span style={{ fontSize: 16 }}>😈</span>
+        <span style={{ color: '#a855f7', fontSize: 13, fontWeight: 600 }}>Games</span>
+      </motion.button>
+
       {/* Sticker */}
       <motion.div
         animate={{ y: [0, -15, 0] }}
@@ -262,7 +290,7 @@ export default function Index() {
           Made with love
         </p>
 
-        {/* BEGIN Button */}
+        {/* START Button */}
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -283,7 +311,7 @@ export default function Index() {
             boxShadow: `0 8px 24px ${colors.primaryGlow}`,
           }}
         >
-          BEGIN
+          START
           <IoHeart size={18} />
         </motion.button>
 
