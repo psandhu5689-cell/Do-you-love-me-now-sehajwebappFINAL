@@ -133,7 +133,7 @@ export default function TortureChamber() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#0a0a0f',
+      background: 'transparent',
       display: 'flex',
       flexDirection: 'column',
       position: 'relative',
@@ -151,12 +151,14 @@ export default function TortureChamber() {
           height: 44,
           borderRadius: 22,
           background: 'rgba(255,255,255,0.1)',
+          backdropFilter: 'blur(10px)',
           border: '1px solid rgba(255,255,255,0.2)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
           zIndex: 101,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
         }}
       >
         <IoChevronBack size={24} color="#fff" />
