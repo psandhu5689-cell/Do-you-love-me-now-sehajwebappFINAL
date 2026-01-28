@@ -133,7 +133,7 @@ export default function HoldReveal() {
               
               <TouchableOpacity
                 style={styles.skipButton}
-                onPress={() => { playClick(); router.push('/shake-reveal'); }}
+                onPress={() => { playClick(); router.push('/quiet-stars'); }}
                 activeOpacity={0.8}
               >
                 <Text style={[styles.skipButtonText, { color: colors.textSecondary }]}>Skip</Text>
@@ -157,7 +157,7 @@ export default function HoldReveal() {
               </ThemedCard>
               
               <TouchableOpacity
-                onPress={() => { playComplete(); router.push('/shake-reveal'); }}
+                onPress={() => { playComplete(); router.push('/quiet-stars'); }}
                 activeOpacity={0.9}
                 style={{ marginTop: 24 }}
               >
