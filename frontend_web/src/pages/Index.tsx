@@ -13,9 +13,17 @@ export default function Index() {
   const navigate = useNavigate()
   const { colors } = useTheme()
   const { playKiss, playClick } = useAudio()
+  const { needsUserInteraction, enableMusic } = useMusic()
   const [checkingIntro, setCheckingIntro] = useState(true)
   const [showUserSetup, setShowUserSetup] = useState(false)
   const [currentUser, setCurrentUser] = useState<string | null>(null)
+  
+  // Handle click anywhere to enable music
+  const handlePageClick = () => {
+    if (needsUserInteraction) {
+      enableMusic()
+    }
+  }
 
   useEffect(() => {
     initializeApp()
