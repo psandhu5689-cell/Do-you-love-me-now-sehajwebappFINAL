@@ -159,7 +159,6 @@ export default function Index() {
 
   return (
     <div 
-      onClick={handlePageClick}
       style={{
         minHeight: '100vh',
         background: 'transparent',
