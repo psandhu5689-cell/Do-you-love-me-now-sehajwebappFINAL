@@ -18,13 +18,6 @@ export default function Index() {
   const [checkingIntro, setCheckingIntro] = useState(true)
   const [showUserSetup, setShowUserSetup] = useState(false)
   const [currentUser, setCurrentUser] = useState<string | null>(null)
-  
-  // Handle click anywhere to enable music
-  const handlePageClick = () => {
-    if (needsUserInteraction) {
-      enableMusic()
-    }
-  }
 
   useEffect(() => {
     initializeApp()
