@@ -510,7 +510,7 @@ export default function TortureChamber() {
                 ref={(el) => (healButtonRefs.current[index] = el)}
                 whileHover={{ scale: 1.08, boxShadow: '0 0 20px rgba(74,222,128,0.4)' }}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => handleHeal(action, index)}
+                onClick={() => handleAction('heal', action, index)}
                 disabled={isDead}
                 style={{
                   background: 'rgba(74,222,128,0.15)',
