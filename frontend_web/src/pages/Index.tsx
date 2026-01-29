@@ -232,35 +232,6 @@ export default function Index() {
         <span style={{ color: '#a855f7', fontSize: 13, fontWeight: 600 }}>Games</span>
       </motion.button>
 
-      {/* Sticker */}
-      <motion.div
-        animate={{ y: [0, -15, 0] }}
-        transition={{ duration: 3, repeat: Infinity }}
-        style={{
-          position: 'absolute',
-          top: 60,
-          right: 5,
-          transform: 'rotate(-12deg)',
-        }}
-      >
-        <div style={{ position: 'relative', width: 130, height: 130 }}>
-          <IoHeart size={130} color={colors.primary} style={{ position: 'absolute' }} />
-          <img
-            src={STICKER_GOLD_DRESS}
-            style={{
-              width: 75,
-              height: 75,
-              borderRadius: 40,
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -40%)',
-              border: `3px solid ${colors.card}`,
-            }}
-          />
-        </div>
-      </motion.div>
-
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
