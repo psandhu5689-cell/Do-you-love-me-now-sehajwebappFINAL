@@ -237,7 +237,7 @@ export default function Index() {
         <span style={{ color: '#a855f7', fontSize: 13, fontWeight: 600 }}>Games</span>
       </motion.button>
 
-      {/* Virtual Bed Button - Top Right */}
+      {/* Mr and Mrs Button - Top Right */}
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -258,8 +258,8 @@ export default function Index() {
           boxShadow: '0 4px 20px rgba(244, 165, 189, 0.3)',
         }}
       >
-        <span style={{ fontSize: 16 }}>🛏️</span>
-        <span style={{ color: '#E8638F', fontSize: 13, fontWeight: 600 }}>Bed</span>
+        <span style={{ fontSize: 16 }}>🐱</span>
+        <span style={{ color: '#E8638F', fontSize: 13, fontWeight: 600 }}>Mr&Mrs</span>
       </motion.button>
 
       <motion.div
