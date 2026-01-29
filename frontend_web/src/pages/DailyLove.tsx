@@ -321,6 +321,12 @@ export default function DailyLove() {
     // Load streak from localStorage
     const storedStreak = localStorage.getItem('dailyLove_streak')
     if (storedStreak) setStreak(parseInt(storedStreak, 10))
+    
+    // Load coin flip tally from localStorage
+    const storedTally = localStorage.getItem('coinFlip_tally')
+    if (storedTally) {
+      setCoinTally(JSON.parse(storedTally))
+    }
   }, [])
 
   const handleCategorySelect = (category: typeof CATEGORIES[0]) => {
