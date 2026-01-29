@@ -165,7 +165,7 @@ const CATEGORIES = [
 // Video for the jukebox CD art
 const JUKEBOX_VIDEO = 'https://customer-assets.emergentagent.com/job_romance-theme/artifacts/04jb8vk3_5744FE7D-DE20-40FB-94A9-C39CB3EDC595.MOV'
 
-// Would You Rather questions
+// Would You Rather questions (35 total)
 const WOULD_YOU_RATHER = [
   { a: "Go on a fancy dinner date", b: "Have a cozy movie night at home" },
   { a: "Receive a handwritten love letter", b: "Get a surprise gift" },
@@ -177,6 +177,32 @@ const WOULD_YOU_RATHER = [
   { a: "Have a surprise party thrown for you", b: "Plan a surprise for me" },
   { a: "Rewatch our first date", b: "Fast forward to our wedding" },
   { a: "Kiss under the stars", b: "Kiss in the rain" },
+  // NEW QUESTIONS (25 more)
+  { a: "Cuddle all day", b: "Go on an adventure together" },
+  { a: "Have breakfast together every morning", b: "Have late night talks every night" },
+  { a: "Hold hands everywhere", b: "Steal kisses randomly" },
+  { a: "Make each other laugh", b: "Comfort each other when sad" },
+  { a: "Cook a meal together", b: "Order takeout and binge watch shows" },
+  { a: "Share one hoodie forever", b: "Have matching jewelry" },
+  { a: "Take a road trip with no destination", b: "Plan every detail of a vacation" },
+  { a: "Dance to our favorite song", b: "Sing karaoke together" },
+  { a: "Have a picnic in the park", b: "Have a candlelit dinner at home" },
+  { a: "Wake up early to watch sunrise together", b: "Stay up late to watch stars" },
+  { a: "Take silly photos together", b: "Have professional couple photoshoot" },
+  { a: "Write love notes to each other", b: "Record voice memos saying I love you" },
+  { a: "Build pillow forts together", b: "Have water balloon fights" },
+  { a: "Go to a fancy event dressed up", b: "Stay home in matching pajamas" },
+  { a: "Learn a new skill together", b: "Teach each other something" },
+  { a: "Have a spa day at home", b: "Go to an actual spa together" },
+  { a: "Plant a garden together", b: "Adopt a pet together" },
+  { a: "Make a scrapbook of memories", b: "Create a digital photo album" },
+  { a: "Have a game night", b: "Have a movie marathon" },
+  { a: "Go to a concert together", b: "Have a private dance party at home" },
+  { a: "Take a cooking class together", b: "Take a dance class together" },
+  { a: "Go stargazing on a blanket", b: "Watch fireworks together" },
+  { a: "Have breakfast for dinner", b: "Have dessert for breakfast" },
+  { a: "Play in the snow together", b: "Splash in puddles after rain" },
+  { a: "Read the same book and discuss it", b: "Watch the same show and react together" },
 ]
 
 // Heart to Heart prompts
