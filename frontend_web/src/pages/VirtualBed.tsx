@@ -254,8 +254,9 @@ export default function VirtualBed() {
   const navigate = useNavigate()
   const { colors } = useTheme()
   
+  // FIXED: Rain audio is always muted on MR & MRS page
   const [isMuted, setIsMuted] = useState(true)
-  const [blanketOffset, setBlanketOffset] = useState(50)
+  const [rainMuted] = useState(true) // Rain is PERMANENTLY muted on MR & MRS
   const [userInteracted, setUserInteracted] = useState(false)
   
   // FIXED: Cats start sitting idle (awake) on load, not sleeping
