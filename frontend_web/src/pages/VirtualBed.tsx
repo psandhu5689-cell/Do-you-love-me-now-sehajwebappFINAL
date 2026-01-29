@@ -435,6 +435,10 @@ export default function VirtualBed() {
         } else {
           setSehajMeter(prev => Math.min(100, prev + 15))
         }
+        // Clear unloved message if showing for this cat
+        if (showUnlovedMessage === cat) {
+          setShowUnlovedMessage(null)
+        }
         setTimeout(() => {
           setOtherCat(prev => ({ ...prev, action: 'tailWag', mood: Math.min(100, prev.mood + 10) }))
         }, 400)
