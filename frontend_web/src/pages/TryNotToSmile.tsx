@@ -36,6 +36,36 @@ const GAMES = [
     description: 'Unleash chaos (he can take it)',
     route: '/torture-chamber',
   },
+  {
+    id: 'virtual-bed',
+    title: 'Virtual Bed',
+    subtitle: 'Cozy Cat Simulation',
+    emoji: '🛏️',
+    icon: IoHeart,
+    gradient: ['#F4A5BD', '#E8638F'],
+    description: 'Interactive bedroom with Prabh & Sehaj cats',
+    route: '/virtual-bed',
+  },
+  {
+    id: 'word-search',
+    title: 'Word Search',
+    subtitle: 'Easy Puzzle Game',
+    emoji: '🔍',
+    icon: IoFlash,
+    gradient: ['#3B82F6', '#2563EB'],
+    description: 'Find hidden words in the grid',
+    route: '/word-search',
+  },
+  {
+    id: 'crossword',
+    title: 'Crossword',
+    subtitle: 'Moderate Puzzle Game',
+    emoji: '✏️',
+    icon: IoFlash,
+    gradient: ['#10B981', '#059669'],
+    description: 'Love-themed crossword puzzle',
+    route: '/crossword',
+  },
 ]
 
 export default function TryNotToSmile() {
