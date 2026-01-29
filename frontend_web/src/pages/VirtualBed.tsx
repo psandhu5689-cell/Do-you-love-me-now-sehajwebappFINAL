@@ -329,9 +329,34 @@ export default function VirtualBed() {
       volume: 0.3,
     })
     
+    // NEW: Initialize cat sound effects
+    catMeowSoftRef.current = new Howl({
+      src: [AUDIO.catMeowSoft],
+      volume: 0.4,
+    })
+    
+    catMeowNightRef.current = new Howl({
+      src: [AUDIO.catMeowNight],
+      volume: 0.4,
+    })
+    
+    catMeowFoodRef.current = new Howl({
+      src: [AUDIO.catMeowFood],
+      volume: 0.4,
+    })
+    
+    catScreamRef.current = new Howl({
+      src: [AUDIO.catScream],
+      volume: 0.5,
+    })
+    
     return () => {
       rainSoundRef.current?.unload()
       tussleRef.current?.unload()
+      catMeowSoftRef.current?.unload()
+      catMeowNightRef.current?.unload()
+      catMeowFoodRef.current?.unload()
+      catScreamRef.current?.unload()
     }
   }, [])
   
