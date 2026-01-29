@@ -286,29 +286,30 @@ export default function TortureChamber() {
             marginBottom: 16,
           }}
         >
-          {/* Floating Damage/Heal Number */}
+          {/* Floating Damage/Heal Numbers - Multiple messages */}
           <AnimatePresence>
-            {floatingDamage && (
+            {floatingMessages.map((msg, idx) => (
               <motion.div
+                key={msg.id}
                 initial={{ opacity: 1, y: 0, scale: 1 }}
-                animate={{ opacity: 0, y: -60, scale: 1.5 }}
+                animate={{ opacity: 0, y: -60 - idx * 15, scale: 1.5 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 1 }}
+                transition={{ duration: 1.8 }}
                 style={{
                   position: 'absolute',
-                  top: -20,
-                  left: '50%',
+                  top: -20 - idx * 20,
+                  left: `${50 + (idx * 10) - 10}%`,
                   transform: 'translateX(-50%)',
-                  color: floatingDamage.isHeal ? '#4ade80' : '#ef4444',
+                  color: msg.isHeal ? '#4ade80' : '#ef4444',
                   fontSize: 32,
                   fontWeight: 'bold',
-                  textShadow: `0 0 10px ${floatingDamage.isHeal ? '#4ade80' : '#ef4444'}`,
-                  zIndex: 10,
+                  textShadow: `0 0 10px ${msg.isHeal ? '#4ade80' : '#ef4444'}`,
+                  zIndex: 10 + idx,
                 }}
               >
-                {floatingDamage.isHeal ? '+' : ''}{floatingDamage.value}
+                {msg.isHeal ? '+' : ''}{msg.value}
               </motion.div>
-            )}
+            ))}
           </AnimatePresence>
 
           {/* Prabh Photo */}
