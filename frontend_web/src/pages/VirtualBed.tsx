@@ -319,6 +319,33 @@ export default function VirtualBed() {
     }
   }, [userInteracted, isMuted])
   
+  // Monitor horniness meters
+  useEffect(() => {
+    let prabhTimer: NodeJS.Timeout | null = null
+    let sehajTimer: NodeJS.Timeout | null = null
+    
+    // Check Prabh meter
+    if (prabhMeter >= 100) {
+      prabhTimer = setTimeout(() => {
+        setShowUnlovedMessage('prabh')
+        setTimeout(() => setShowUnlovedMessage(null), 4000)
+      }, 10000) // Show after 10 seconds at 100
+    }
+    
+    // Check Sehaj meter
+    if (sehajMeter >= 100) {
+      sehajTimer = setTimeout(() => {
+        setShowUnlovedMessage('sehaj')
+        setTimeout(() => setShowUnlovedMessage(null), 4000)
+      }, 10000) // Show after 10 seconds at 100
+    }
+    
+    return () => {
+      if (prabhTimer) clearTimeout(prabhTimer)
+      if (sehajTimer) clearTimeout(sehajTimer)
+    }
+  }, [prabhMeter, sehajMeter])
+  
   useEffect(() => {
     if (showEffect) {
       const timeout = setTimeout(() => setShowEffect(null), 1500)
