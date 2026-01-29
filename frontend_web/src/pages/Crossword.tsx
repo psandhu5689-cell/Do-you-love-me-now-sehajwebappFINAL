@@ -660,8 +660,110 @@ export default function Crossword() {
               </div>
             </div>
           </div>
+          
+          {/* Skip Button */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => {
+              haptics.light()
+              navigate(-1)
+            }}
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              borderRadius: 12,
+              background: 'transparent',
+              border: `1px solid ${colors.border}`,
+              color: colors.textSecondary,
+              fontSize: 14,
+              fontWeight: 500,
+              cursor: 'pointer',
+              marginTop: 16,
+            }}
+          >
+            Skip Puzzle →
+          </motion.button>
+          
+          {/* Collapsible Answer Key */}
+          <AnswerKey colors={colors} clues={CROSSWORD_PUZZLE} />
         </div>
       </div>
+    </div>
+  )
+}
+
+// Answer Key Component
+function AnswerKey({ colors, clues }: { colors: any; clues: Clue[] }) {
+  const [isOpen, setIsOpen] = useState(false)
+  
+  return (
+    <div style={{ marginTop: 20 }}>
+      <motion.button
+        whileTap={{ scale: 0.98 }}
+        onClick={() => {
+          haptics.light()
+          setIsOpen(!isOpen)
+        }}
+        style={{
+          width: '100%',
+          padding: '12px 16px',
+          borderRadius: 12,
+          background: colors.card,
+          border: `1px solid ${colors.border}`,
+          color: colors.textSecondary,
+          fontSize: 13,
+          fontWeight: 500,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <span>📝 Answer Key</span>
+        <span style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
+          ▼
+        </span>
+      </motion.button>
+      
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div style={{
+              marginTop: 12,
+              padding: 16,
+              background: colors.card,
+              borderRadius: 12,
+              border: `1px solid ${colors.border}`,
+            }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: colors.textSecondary, marginBottom: 8 }}>Across →</p>
+                  {clues.filter(c => c.direction === 'across').map((clue) => (
+                    <p key={clue.number} style={{ fontSize: 11, color: colors.textMuted, marginBottom: 4 }}>
+                      <strong>{clue.number}.</strong> {clue.answer}
+                    </p>
+                  ))}
+                </div>
+                <div>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: colors.textSecondary, marginBottom: 8 }}>Down ↓</p>
+                  {clues.filter(c => c.direction === 'down').map((clue) => (
+                    <p key={clue.number} style={{ fontSize: 11, color: colors.textMuted, marginBottom: 4 }}>
+                      <strong>{clue.number}.</strong> {clue.answer}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
