@@ -7,11 +7,11 @@ import { useUser } from '../context/UserContext'
 import { useAudio } from '../context/AudioContext'
 
 const ORIGIN_STORY = [
-  { text: "It started with a simple 'hi' on Tinder.", delay: 0 },
-  { text: "I thought you were cute (still do).", delay: 0.5 },
-  { text: "You thought I was... acceptable?", delay: 1 },
-  { text: "Fast forward to today...", delay: 1.5 },
-  { text: "And here we are.", delay: 2 },
+  // REMOVED: "It started with a simple 'hi' on Tinder." line as per request
+  { text: "I thought you were cute (still do).", delay: 0 },
+  { text: "You thought I was... acceptable?", delay: 0.5 },
+  { text: "Fast forward to today...", delay: 1 },
+  { text: "And here we are.", delay: 1.5 },
 ]
 
 export default function Origin() {
