@@ -37,16 +37,6 @@ const GAMES = [
     route: '/torture-chamber',
   },
   {
-    id: 'virtual-bed',
-    title: 'Virtual Bed',
-    subtitle: 'Cozy Cat Simulation',
-    emoji: '🛏️',
-    icon: IoHeart,
-    gradient: ['#F4A5BD', '#E8638F'],
-    description: 'Interactive bedroom with Prabh & Sehaj cats',
-    route: '/virtual-bed',
-  },
-  {
     id: 'word-search',
     title: 'Word Search',
     subtitle: 'Easy Puzzle Game',
