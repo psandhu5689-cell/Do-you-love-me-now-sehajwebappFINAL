@@ -141,41 +141,81 @@ interface SpriteProps {
 
 function Sprite({ sheet, animations, currentAnimation, onAnimationEnd, scale = 1, flip = false }: SpriteProps) {
   const [frame, setFrame] = useState(0)
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [lastGoodFrame, setLastGoodFrame] = useState(0)
   const animRef = useRef<number | null>(null)
   const lastTimeRef = useRef(0)
   const animEndCalledRef = useRef(false)
+  const imageRef = useRef<HTMLImageElement | null>(null)
   
-  // SAFETY: Always have a fallback animation
+  // SAFETY 1: Always have a fallback animation
   const anim = animations[currentAnimation] || animations.sitIdle || { startRow: 0, frameCount: 8, fps: 2, loop: true }
   
+  // SAFETY 2: Preload image before animation starts
+  useEffect(() => {
+    const img = new Image()
+    img.src = sheet
+    imageRef.current = img
+    
+    const handleLoad = () => {
+      setImageLoaded(true)
+    }
+    
+    if (img.complete) {
+      setImageLoaded(true)
+    } else {
+      img.addEventListener('load', handleLoad)
+    }
+    
+    return () => {
+      img.removeEventListener('load', handleLoad)
+    }
+  }, [sheet])
+  
+  // SAFETY 3: Reset frame on animation change
   useEffect(() => {
     setFrame(0)
+    setLastGoodFrame(0)
     lastTimeRef.current = 0
     animEndCalledRef.current = false
+  }, [currentAnimation])
+  
+  // SAFETY 4: Animation loop with hard clamping
+  useEffect(() => {
+    if (!imageLoaded) return // Don't start until image loaded
     
     const animate = (time: number) => {
       if (!lastTimeRef.current) lastTimeRef.current = time
       
       const delta = time - lastTimeRef.current
-      const frameTime = 1000 / (anim.fps || 2) // SAFETY: Default fps
+      const frameTime = 1000 / Math.max(1, anim.fps || 2) // SAFETY: Minimum fps
       
       if (delta >= frameTime) {
         setFrame(prev => {
           const nextFrame = prev + 1
-          // SAFETY: Clamp frame index to valid range
-          const maxFrame = (anim.frameCount || 8) - 1
+          const maxFrame = Math.max(0, (anim.frameCount || 8) - 1)
+          
+          // SAFETY: Hard clamp nextFrame
+          let safeFrame = Math.min(Math.max(0, nextFrame), maxFrame)
+          
           if (nextFrame > maxFrame) {
             if (anim.loop) {
-              return 0 // Loop back to start
+              safeFrame = 0 // Loop back to start
             } else {
               if (!animEndCalledRef.current) {
                 animEndCalledRef.current = true
                 setTimeout(() => onAnimationEnd?.(), 50)
               }
-              return Math.min(prev, maxFrame) // SAFETY: Stay at last valid frame
+              safeFrame = maxFrame // Stay at last frame
             }
           }
-          return Math.min(nextFrame, maxFrame) // SAFETY: Never exceed max
+          
+          // SAFETY: Update last good frame only if valid
+          if (safeFrame >= 0 && safeFrame <= maxFrame) {
+            setLastGoodFrame(safeFrame)
+          }
+          
+          return safeFrame
         })
         lastTimeRef.current = time
       }
@@ -190,17 +230,38 @@ function Sprite({ sheet, animations, currentAnimation, onAnimationEnd, scale = 1
         cancelAnimationFrame(animRef.current)
       }
     }
-  }, [currentAnimation, anim.fps, anim.frameCount, anim.loop, onAnimationEnd])
+  }, [currentAnimation, anim.fps, anim.frameCount, anim.loop, onAnimationEnd, imageLoaded])
   
-  // SAFETY: Clamp all values to prevent invalid rendering
+  // SAFETY 5: Use last good frame if current frame is invalid
+  const safeFrame = frame >= 0 && frame < (anim.frameCount || 8) ? frame : lastGoodFrame
+  
+  // SAFETY 6: Clamp all rendering values
   const frameCount = Math.max(1, anim.frameCount || 8)
-  const frameCol = Math.min(frame, frameCount - 1) // Clamped frame
-  const row = Math.max(0, Math.min(71, anim.startRow || 0)) // Clamped row (0-71)
-  const displaySize = FRAME_SIZE * (scale || 1)
+  const frameCol = Math.min(Math.max(0, safeFrame), frameCount - 1)
+  const row = Math.max(0, Math.min(71, anim.startRow || 0))
+  const displaySize = Math.max(32, FRAME_SIZE * (scale || 1))
   
-  // Calculate background position
+  // Calculate background position with safety bounds
   const bgX = -frameCol * FRAME_SIZE * scale
   const bgY = -row * FRAME_SIZE * scale
+  
+  // SAFETY 7: Don't render if image not loaded - show placeholder
+  if (!imageLoaded) {
+    return (
+      <div style={{
+        width: displaySize,
+        height: displaySize,
+        background: 'rgba(255,255,255,0.1)',
+        borderRadius: 8,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        opacity: 1,
+      }}>
+        <span style={{ fontSize: 24 }}>🐱</span>
+      </div>
+    )
+  }
   
   return (
     <div style={{
@@ -210,9 +271,10 @@ function Sprite({ sheet, animations, currentAnimation, onAnimationEnd, scale = 1
       transform: flip ? 'scaleX(-1)' : 'none',
       imageRendering: 'pixelated',
       borderRadius: 8,
-      // SAFETY: Never allow opacity 0 or display none
-      opacity: 1,
-      display: 'block',
+      // SAFETY 8: Force visible with important-like specificity
+      opacity: '1 !important' as any,
+      display: 'block !important' as any,
+      visibility: 'visible !important' as any,
     }}>
       <div style={{
         width: displaySize,
@@ -222,8 +284,9 @@ function Sprite({ sheet, animations, currentAnimation, onAnimationEnd, scale = 1
         backgroundPosition: `${bgX}px ${bgY}px`,
         backgroundRepeat: 'no-repeat',
         imageRendering: 'pixelated',
-        // SAFETY: Ensure content is always visible
-        opacity: 1,
+        // SAFETY 9: Ensure sprite is always painted
+        opacity: '1 !important' as any,
+        willChange: 'background-position',
       }} />
     </div>
   )
