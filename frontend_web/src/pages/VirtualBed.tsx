@@ -1205,6 +1205,64 @@ export default function VirtualBed() {
             </div>
           </div>
           
+          {/* Horniness Meters */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginTop: 16,
+            gap: 16,
+          }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <p style={{ color: '#E67E22', fontSize: 12, fontWeight: 600 }}>🧡 Sehaj Affection</p>
+                <p style={{ color: '#E67E22', fontSize: 11, fontWeight: 600 }}>{sehajMeter}%</p>
+              </div>
+              <div style={{
+                width: '100%',
+                height: 6,
+                background: colors.card,
+                borderRadius: 3,
+                overflow: 'hidden',
+                border: `1px solid ${colors.border}`,
+              }}>
+                <motion.div
+                  animate={{ width: `${sehajMeter}%` }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  style={{
+                    height: '100%',
+                    background: sehajMeter >= 100 ? 'linear-gradient(90deg, #FF6B9D, #E91E63)' : 'linear-gradient(90deg, #E67E22, #F39C12)',
+                    borderRadius: 3,
+                  }}
+                />
+              </div>
+            </div>
+            
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <p style={{ color: '#8E44AD', fontSize: 12, fontWeight: 600 }}>🖤 Prabh Affection</p>
+                <p style={{ color: '#8E44AD', fontSize: 11, fontWeight: 600 }}>{prabhMeter}%</p>
+              </div>
+              <div style={{
+                width: '100%',
+                height: 6,
+                background: colors.card,
+                borderRadius: 3,
+                overflow: 'hidden',
+                border: `1px solid ${colors.border}`,
+              }}>
+                <motion.div
+                  animate={{ width: `${prabhMeter}%` }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  style={{
+                    height: '100%',
+                    background: prabhMeter >= 100 ? 'linear-gradient(90deg, #FF6B9D, #E91E63)' : 'linear-gradient(90deg, #8E44AD, #9B59B6)',
+                    borderRadius: 3,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          
           {/* Control Buttons */}
           <div style={{
             display: 'grid',
