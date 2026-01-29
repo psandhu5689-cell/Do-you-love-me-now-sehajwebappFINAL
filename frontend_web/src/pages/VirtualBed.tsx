@@ -1344,7 +1344,7 @@ export default function VirtualBed() {
             </div>
           </div>
           
-          {/* Horniness Meters */}
+          {/* Freakiness Meters */}
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
