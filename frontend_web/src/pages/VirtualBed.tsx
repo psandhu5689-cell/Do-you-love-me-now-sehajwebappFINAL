@@ -371,7 +371,7 @@ export default function VirtualBed() {
     }
   }, [userInteracted, isMuted])
   
-  // Monitor horniness meters
+  // Monitor freakiness meters
   useEffect(() => {
     let prabhTimer: NodeJS.Timeout | null = null
     let sehajTimer: NodeJS.Timeout | null = null
@@ -398,7 +398,7 @@ export default function VirtualBed() {
     }
   }, [prabhMeter, sehajMeter])
   
-  // Gradually decrease horniness meters over time
+  // Gradually decrease freakiness meters over time
   useEffect(() => {
     const interval = setInterval(() => {
       setPrabhMeter(prev => Math.max(0, prev - 1))
