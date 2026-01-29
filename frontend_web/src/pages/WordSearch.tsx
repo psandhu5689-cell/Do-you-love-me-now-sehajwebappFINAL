@@ -329,16 +329,20 @@ export default function WordSearch() {
           padding: 24,
           boxShadow: `0 8px 32px ${colors.primaryGlow}`,
         }}>
-          {/* Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${puzzle.grid[0].length}, 1fr)`,
-            gap: 2,
-            maxWidth: 400,
-            margin: '0 auto 24px',
-            touchAction: 'none',
-            userSelect: 'none',
-          }}>
+          {/* Grid - with touch drag support */}
+          <div 
+            ref={gridRef}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${puzzle.grid[0].length}, 1fr)`,
+              gap: 2,
+              maxWidth: 400,
+              margin: '0 auto 24px',
+              touchAction: 'none',
+              userSelect: 'none',
+            }}>
             {puzzle.grid.map((row, rowIndex) =>
               row.map((cell, colIndex) => {
                 const key = `${rowIndex},${colIndex}`
@@ -352,7 +356,7 @@ export default function WordSearch() {
                     whileTap={{ scale: 0.9 }}
                     onMouseDown={() => handleCellMouseDown(rowIndex, colIndex)}
                     onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
-                    onTouchStart={() => handleCellMouseDown(rowIndex, colIndex)}
+                    onTouchStart={(e) => handleTouchStart(e, rowIndex, colIndex)}
                     style={{
                       aspectRatio: '1',
                       background: isSelected
