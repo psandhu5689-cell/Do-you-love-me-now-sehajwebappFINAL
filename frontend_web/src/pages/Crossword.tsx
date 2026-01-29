@@ -242,27 +242,57 @@ export default function Crossword() {
   }
 
   const handleRevealLetter = () => {
-    if (revealCount <= 0 || !selectedCell) return
+    if (revealCount <= 0) return
     
     haptics.medium()
     
-    const { row, col } = selectedCell
-    
-    // Find which answer this cell belongs to
-    for (const clue of CROSSWORD_PUZZLE) {
+    // Find all unsolved words
+    const unsolvedWords = CROSSWORD_PUZZLE.filter(clue => {
       for (let i = 0; i < clue.answer.length; i++) {
         const cellRow = clue.direction === 'across' ? clue.row : clue.row + i
         const cellCol = clue.direction === 'across' ? clue.col + i : clue.col
-        
-        if (cellRow === row && cellCol === col) {
-          const newGrid = userGrid.map(r => [...r])
-          newGrid[row][col] = clue.answer[i]
-          setUserGrid(newGrid)
-          setRevealCount(prev => prev - 1)
-          return
+        if (userGrid[cellRow][cellCol] !== clue.answer[i]) {
+          return true // This word is not fully solved
         }
       }
+      return false
+    })
+    
+    if (unsolvedWords.length === 0) return
+    
+    // Pick a random unsolved word
+    const randomWord = unsolvedWords[Math.floor(Math.random() * unsolvedWords.length)]
+    
+    // Find up to 2 unsolved letters in this word
+    const unsolvedIndices: number[] = []
+    for (let i = 0; i < randomWord.answer.length; i++) {
+      const cellRow = randomWord.direction === 'across' ? randomWord.row : randomWord.row + i
+      const cellCol = randomWord.direction === 'across' ? randomWord.col + i : randomWord.col
+      if (userGrid[cellRow][cellCol] !== randomWord.answer[i]) {
+        unsolvedIndices.push(i)
+      }
     }
+    
+    // Reveal up to 2 letters
+    const newGrid = userGrid.map(r => [...r])
+    const lettersToReveal = Math.min(2, unsolvedIndices.length)
+    
+    for (let j = 0; j < lettersToReveal; j++) {
+      const randomIndex = unsolvedIndices[Math.floor(Math.random() * unsolvedIndices.length)]
+      const cellRow = randomWord.direction === 'across' ? randomWord.row : randomWord.row + randomIndex
+      const cellCol = randomWord.direction === 'across' ? randomWord.col + randomIndex : randomWord.col
+      
+      newGrid[cellRow][cellCol] = randomWord.answer[randomIndex]
+      
+      // Remove this index so we don't reveal it again
+      const idxToRemove = unsolvedIndices.indexOf(randomIndex)
+      if (idxToRemove > -1) {
+        unsolvedIndices.splice(idxToRemove, 1)
+      }
+    }
+    
+    setUserGrid(newGrid)
+    setRevealCount(prev => prev - 1)
   }
 
   const handleCheckWord = () => {
