@@ -138,8 +138,9 @@ export default function AnimatedBackground({
         </motion.div>
       ))}
 
-      {/* Shooting elements */}
-      {shootingElements.map((element) => (
+      {/* REMOVED: Shooting elements - hearts should not drift */}
+      {/* Stars only twinkle subtly in dark mode */}
+      {isDark && shootingElements.map((element) => (
         <motion.div
           key={`shooting-${element.id}`}
           initial={{ 
@@ -161,37 +162,31 @@ export default function AnimatedBackground({
           }}
           style={{
             position: 'absolute',
-            fontSize: isDark ? 0 : 16,
+            fontSize: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          {isDark ? (
-            <>
-              <div style={{
-                width: 4,
-                height: 4,
-                borderRadius: '50%',
-                background: 'white',
-                boxShadow: '0 0 10px white, 0 0 20px white',
-              }} />
-              {/* Shooting star tail */}
-              <div style={{
-                position: 'absolute',
-                top: 1,
-                right: 4,
-                width: 60,
-                height: 2,
-                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), white)',
-                transform: 'rotate(-45deg) translateX(30px)',
-                transformOrigin: 'right center',
-                borderRadius: 2,
-              }} />
-            </>
-          ) : (
-            <span style={{ filter: 'drop-shadow(0 0 4px rgba(255,105,180,0.8))' }}>💗</span>
-          )}
+          <div style={{
+            width: 4,
+            height: 4,
+            borderRadius: '50%',
+            background: 'white',
+            boxShadow: '0 0 10px white, 0 0 20px white',
+          }} />
+          {/* Shooting star tail */}
+          <div style={{
+            position: 'absolute',
+            top: 1,
+            right: 4,
+            width: 60,
+            height: 2,
+            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), white)',
+            transform: 'rotate(-45deg) translateX(30px)',
+            transformOrigin: 'right center',
+            borderRadius: 2,
+          }} />
         </motion.div>
       ))}
     </div>
