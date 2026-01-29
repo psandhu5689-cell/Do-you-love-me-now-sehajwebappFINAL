@@ -132,10 +132,15 @@ export default function CrosswordGame() {
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!selectedCell) return
     
+    // Don't allow editing locked cells
+    if (lockedCells[selectedCell.row][selectedCell.col]) {
+      return
+    }
+    
     const key = e.key.toUpperCase()
     
     if (key === 'BACKSPACE') {
-      // Clear current cell and move back
+      // Clear current cell and move back (only if not locked)
       setUserGrid(prev => {
         const newGrid = prev.map(row => [...row])
         newGrid[selectedCell.row][selectedCell.col] = null
@@ -143,7 +148,7 @@ export default function CrosswordGame() {
       })
       moveToPrevCell(selectedCell.row, selectedCell.col)
     } else if (key.length === 1 && key >= 'A' && key <= 'Z') {
-      // Fill current cell and move forward
+      // Fill current cell and move forward (only if not locked)
       setUserGrid(prev => {
         const newGrid = prev.map(row => [...row])
         newGrid[selectedCell.row][selectedCell.col] = key
