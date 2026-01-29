@@ -301,25 +301,26 @@ export default function TortureChamber() {
             marginBottom: 16,
           }}
         >
-          {/* Floating Damage/Heal Numbers - Multiple messages */}
+          {/* Floating Damage/Heal Numbers - Positioned above clicked buttons */}
           <AnimatePresence>
-            {floatingMessages.map((msg, idx) => (
+            {floatingMessages.map((msg) => (
               <motion.div
                 key={msg.id}
                 initial={{ opacity: 1, y: 0, scale: 1 }}
-                animate={{ opacity: 0, y: -60 - idx * 15, scale: 1.5 }}
+                animate={{ opacity: 0, y: -80, scale: 1.5 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1 }} // FIXED: 1 second animation
                 style={{
-                  position: 'absolute',
-                  top: -20 - idx * 20,
-                  left: `${50 + (idx * 10) - 10}%`,
-                  transform: 'translateX(-50%)',
+                  position: 'fixed',
+                  left: `${msg.x}%`,
+                  top: `${msg.y}%`,
+                  transform: 'translate(-50%, -100%)',
                   color: msg.isHeal ? '#4ade80' : '#ef4444',
                   fontSize: 32,
                   fontWeight: 'bold',
                   textShadow: `0 0 10px ${msg.isHeal ? '#4ade80' : '#ef4444'}`,
-                  zIndex: 10 + idx,
+                  zIndex: 100,
+                  pointerEvents: 'none',
                 }}
               >
                 {msg.isHeal ? '+' : ''}{msg.value}
