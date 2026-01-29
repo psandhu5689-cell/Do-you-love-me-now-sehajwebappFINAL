@@ -1230,7 +1230,7 @@ export default function DailyLove() {
                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
                 style={{ paddingTop: 60 }}
               >
-                {SAD_MODE_MESSAGES.map((msg, i) => (
+                {SAD_MESSAGES.map((msg: string, i: number) => (
                   <div
                     key={i}
                     style={{
