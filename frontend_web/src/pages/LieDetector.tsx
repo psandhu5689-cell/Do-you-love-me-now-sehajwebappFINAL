@@ -162,6 +162,32 @@ export default function LieDetector() {
         <IoChevronBack size={24} color="#00ff00" />
       </motion.button>
 
+      {/* History Button */}
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        onClick={() => {
+          playClick()
+          setShowHistory(true)
+        }}
+        style={{
+          position: 'absolute',
+          top: 20,
+          right: 16,
+          width: 44,
+          height: 44,
+          borderRadius: 22,
+          background: 'rgba(0,255,0,0.1)',
+          border: '1px solid rgba(0,255,0,0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          zIndex: 101,
+        }}
+      >
+        <IoTime size={24} color="#00ff00" />
+      </motion.button>
+
       <div style={{ padding: '80px 24px 24px', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         {/* Title */}
         <motion.h1
