@@ -406,7 +406,15 @@ export default function DailyLove() {
     setCoinResult(null)
     
     setTimeout(() => {
-      setCoinResult(Math.random() > 0.5 ? 'Sehaj is Right! 👑' : 'Prabh is Right! 🏆')
+      const winner = Math.random() > 0.5 ? 'sehaj' : 'prabh'
+      const newTally = {
+        ...coinTally,
+        [winner]: coinTally[winner] + 1
+      }
+      setCoinTally(newTally)
+      localStorage.setItem('coinFlip_tally', JSON.stringify(newTally))
+      
+      setCoinResult(winner === 'sehaj' ? 'Sehaj is Right! 👑' : 'Prabh is Right! 🏆')
       setIsFlipping(false)
     }, 1500)
   }
