@@ -83,6 +83,26 @@ export default function TortureChamber() {
     return '#ef4444' // Red
   }
 
+  // Add floating message with auto-removal
+  const addFloatingMessage = (value: number, isHeal: boolean) => {
+    const id = `${Date.now()}-${Math.random()}`
+    const newMessage = { id, value, isHeal, timestamp: Date.now() }
+    
+    setFloatingMessages(prev => {
+      const updated = [...prev, newMessage]
+      // Limit to max 3 messages
+      if (updated.length > 3) {
+        return updated.slice(-3)
+      }
+      return updated
+    })
+    
+    // Auto-remove after 1.8 seconds
+    setTimeout(() => {
+      setFloatingMessages(prev => prev.filter(msg => msg.id !== id))
+    }, 1800)
+  }
+
   // Handle damage
   const handleDamage = (attack: typeof DAMAGE_ATTACKS[0]) => {
     playPop()
@@ -94,8 +114,7 @@ export default function TortureChamber() {
     setHp(newHp)
 
     // Show floating damage
-    setFloatingDamage({ value: -attack.damage, isHeal: false })
-    setTimeout(() => setFloatingDamage(null), 1000)
+    addFloatingMessage(-attack.damage, false)
 
     // Random message or attack message
     if (Math.random() < 0.3) {
