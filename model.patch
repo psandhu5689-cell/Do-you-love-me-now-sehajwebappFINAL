@@ -1,81 +1,240 @@
-diff --git a/frontend_web/src/pages/TortureChamber.tsx b/frontend_web/src/pages/TortureChamber.tsx
-index fdd16db..5cc8e72 100644
---- a/frontend_web/src/pages/TortureChamber.tsx
-+++ b/frontend_web/src/pages/TortureChamber.tsx
-@@ -193,20 +193,22 @@ export default function TortureChamber() {
+diff --git a/frontend_web/src/pages/VirtualBed.tsx b/frontend_web/src/pages/VirtualBed.tsx
+index 0a7cb7a..e352115 100644
+--- a/frontend_web/src/pages/VirtualBed.tsx
++++ b/frontend_web/src/pages/VirtualBed.tsx
+@@ -641,17 +641,35 @@ export default function VirtualBed() {
+             boxShadow: `0 8px 32px ${colors.primaryGlow}`,
+           }}
+         >
+-          {/* Rainy Window - Always rainy GIF style */}
++          {/* Rainy Window - Real Video Loop */}
            <div style={{
-             width: '100%',
-             height: 28,
--            background: 'rgba(255,255,255,0.1)',
-+            background: 'rgba(255,255,255,0.05)',
-+            backdropFilter: 'blur(10px)',
-             borderRadius: 14,
-             overflow: 'hidden',
+             width: 180,
+             height: 130,
+-            background: 'linear-gradient(180deg, #2a3a5e 0%, #1a2540 100%)',
+             border: '6px solid #5D4037',
+             borderRadius: 12,
+             margin: '0 auto 16px',
              position: 'relative',
--            border: hp > 100 ? '2px solid #ff69b4' : '1px solid rgba(255,255,255,0.2)',
--            boxShadow: hp > 100 ? '0 0 15px rgba(255,105,180,0.5)' : 'none',
-+            border: hp > 1500 ? '2px solid #ff69b4' : '1px solid rgba(255,255,255,0.2)',
-+            boxShadow: hp > 1500 ? '0 0 25px rgba(255,105,180,0.5)' : '0 4px 20px rgba(0,0,0,0.2), inset 0 0 20px rgba(255,255,255,0.05)',
+             overflow: 'hidden',
            }}>
++            {/* Background Video */}
++            <video
++              autoPlay
++              loop
++              muted
++              playsInline
++              style={{
++                position: 'absolute',
++                top: 0,
++                left: 0,
++                width: '100%',
++                height: '100%',
++                objectFit: 'cover',
++                zIndex: 0,
++              }}
++            >
++              <source src="/window-rain.mov" type="video/mp4" />
++            </video>
++            
+             {/* Window frame */}
+             <div style={{
+               position: 'absolute',
+@@ -661,6 +679,7 @@ export default function VirtualBed() {
+               height: '100%',
+               background: '#5D4037',
+               transform: 'translateX(-50%)',
++              zIndex: 1,
+             }} />
+             <div style={{
+               position: 'absolute',
+@@ -670,46 +689,8 @@ export default function VirtualBed() {
+               height: 6,
+               background: '#5D4037',
+               transform: 'translateY(-50%)',
++              zIndex: 1,
+             }} />
+-            
+-            {/* Rain animation - always on */}
+-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
+-              {[...Array(40)].map((_, i) => (
+-                <motion.div
+-                  key={i}
+-                  initial={{ y: -20, x: `${Math.random() * 100}%`, opacity: 0.7 }}
+-                  animate={{ y: 150, opacity: [0.7, 0.4, 0.7] }}
+-                  transition={{
+-                    duration: 0.6 + Math.random() * 0.4,
+-                    repeat: Infinity,
+-                    delay: Math.random() * 0.6,
+-                    ease: 'linear',
+-                  }}
+-                  style={{
+-                    position: 'absolute',
+-                    width: 2,
+-                    height: 12,
+-                    background: 'linear-gradient(180deg, rgba(150, 200, 255, 0.8), rgba(150, 200, 255, 0.2))',
+-                    borderRadius: 2,
+-                  }}
+-                />
+-              ))}
+-            </div>
+-            
+-            {/* Distant lightning flash occasionally */}
+-            <motion.div
+-              animate={{ opacity: [0, 0, 0, 0, 0.3, 0, 0.1, 0] }}
+-              transition={{ duration: 8, repeat: Infinity, repeatDelay: 5 }}
+-              style={{
+-                position: 'absolute',
+-                top: 0,
+-                left: 0,
+-                right: 0,
+-                bottom: 0,
+-                background: 'white',
+-                pointerEvents: 'none',
+-              }}
+-            />
+           </div>
+           
+           {/* Floor Scene Container */}
+@@ -723,49 +704,18 @@ export default function VirtualBed() {
+             borderRadius: 16,
+             overflow: 'hidden',
+           }}>
+-            {/* Cartoon Floor Background */}
++            {/* Real Cartoon Floor Background from Attached Image */}
+             <div style={{
+               position: 'absolute',
+               bottom: 0,
+               width: '100%',
+               height: '100%',
+-              background: `
+-                linear-gradient(180deg, 
+-                  transparent 0%, 
+-                  rgba(139, 90, 43, 0.1) 40%,
+-                  rgba(139, 90, 43, 0.3) 60%,
+-                  #DEB887 70%,
+-                  #D2A679 85%,
+-                  #C4956A 100%
+-                )
+-              `,
++              backgroundImage: 'url(/floor.jpeg)',
++              backgroundSize: 'cover',
++              backgroundPosition: 'center bottom',
++              backgroundRepeat: 'no-repeat',
+               zIndex: 0,
+-            }}>
+-              {/* Wood grain pattern */}
+-              <div style={{
+-                position: 'absolute',
+-                bottom: 0,
+-                left: 0,
+-                right: 0,
+-                height: '40%',
+-                background: `
+-                  repeating-linear-gradient(
+-                    90deg,
+-                    transparent,
+-                    transparent 60px,
+-                    rgba(139, 69, 19, 0.15) 60px,
+-                    rgba(139, 69, 19, 0.15) 62px
+-                  ),
+-                  repeating-linear-gradient(
+-                    0deg,
+-                    transparent,
+-                    transparent 15px,
+-                    rgba(139, 69, 19, 0.08) 15px,
+-                    rgba(139, 69, 19, 0.08) 16px
+-                  )
+-                `,
+-              }} />
+-            </div>
++            }} />
+             
+             {/* Sehaj Cat (Left - Ginger) */}
              <motion.div
-               animate={{ width: `${Math.min((hp / maxHp) * 100, 120)}%` }}
-               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-               style={{
-                 height: '100%',
--                background: getHpColor(),
-+                background: `linear-gradient(90deg, ${getHpColor()}, ${getHpColor()}cc)`,
-                 borderRadius: 14,
-+                boxShadow: `0 0 20px ${getHpColor()}50`,
-               }}
-             />
-             <span style={{
-@@ -217,7 +219,7 @@ export default function TortureChamber() {
-               color: '#fff',
-               fontWeight: 'bold',
-               fontSize: 14,
--              textShadow: '0 1px 3px rgba(0,0,0,0.5)',
-+              textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-             }}>
-               {hp} / {maxHp} HP
-             </span>
 diff --git a/model.patch b/model.patch
-index 30e44ec..e69de29 100644
+index d4077ef..a7d585b 100644
 --- a/model.patch
 +++ b/model.patch
-@@ -1,36 +0,0 @@
--diff --git a/frontend/app/index.tsx b/frontend/app/index.tsx
--index cd5666a..ae7ecd1 100644
----- a/frontend/app/index.tsx
--+++ b/frontend/app/index.tsx
--@@ -101,7 +101,7 @@ export default function EntryGate() {
--         }),
--       ])
--     ).start();
---  }, []);
--+  }, [checkingIntro]);
-- 
--   const heartTranslateY = heartAnim.interpolate({
--     inputRange: [0, 1],
+@@ -1,81 +0,0 @@
+-diff --git a/frontend_web/src/pages/TortureChamber.tsx b/frontend_web/src/pages/TortureChamber.tsx
+-index fdd16db..5cc8e72 100644
+---- a/frontend_web/src/pages/TortureChamber.tsx
+-+++ b/frontend_web/src/pages/TortureChamber.tsx
+-@@ -193,20 +193,22 @@ export default function TortureChamber() {
+-           <div style={{
+-             width: '100%',
+-             height: 28,
+--            background: 'rgba(255,255,255,0.1)',
+-+            background: 'rgba(255,255,255,0.05)',
+-+            backdropFilter: 'blur(10px)',
+-             borderRadius: 14,
+-             overflow: 'hidden',
+-             position: 'relative',
+--            border: hp > 100 ? '2px solid #ff69b4' : '1px solid rgba(255,255,255,0.2)',
+--            boxShadow: hp > 100 ? '0 0 15px rgba(255,105,180,0.5)' : 'none',
+-+            border: hp > 1500 ? '2px solid #ff69b4' : '1px solid rgba(255,255,255,0.2)',
+-+            boxShadow: hp > 1500 ? '0 0 25px rgba(255,105,180,0.5)' : '0 4px 20px rgba(0,0,0,0.2), inset 0 0 20px rgba(255,255,255,0.05)',
+-           }}>
+-             <motion.div
+-               animate={{ width: `${Math.min((hp / maxHp) * 100, 120)}%` }}
+-               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+-               style={{
+-                 height: '100%',
+--                background: getHpColor(),
+-+                background: `linear-gradient(90deg, ${getHpColor()}, ${getHpColor()}cc)`,
+-                 borderRadius: 14,
+-+                boxShadow: `0 0 20px ${getHpColor()}50`,
+-               }}
+-             />
+-             <span style={{
+-@@ -217,7 +219,7 @@ export default function TortureChamber() {
+-               color: '#fff',
+-               fontWeight: 'bold',
+-               fontSize: 14,
+--              textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+-+              textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+-             }}>
+-               {hp} / {maxHp} HP
+-             </span>
 -diff --git a/model.patch b/model.patch
--index 5d9f76b..e69de29 100644
+-index 30e44ec..e69de29 100644
 ---- a/model.patch
 -+++ b/model.patch
--@@ -1,18 +0,0 @@
---diff --git a/frontend/app/memories.tsx b/frontend/app/memories.tsx
---index 51ca983..e6cac96 100644
------ a/frontend/app/memories.tsx
---+++ b/frontend/app/memories.tsx
---@@ -306,6 +306,13 @@ const styles = StyleSheet.create({
---     flex: 1,
---     backgroundColor: '#FFF5F7',
---   },
---+  backButton: {
---+    position: 'absolute',
---+    top: 50,
---+    left: 16,
---+    zIndex: 10,
---+    padding: 8,
---+  },
---   content: {
---     flex: 1,
---     padding: 24,
+-@@ -1,36 +0,0 @@
+--diff --git a/frontend/app/index.tsx b/frontend/app/index.tsx
+--index cd5666a..ae7ecd1 100644
+----- a/frontend/app/index.tsx
+--+++ b/frontend/app/index.tsx
+--@@ -101,7 +101,7 @@ export default function EntryGate() {
+--         }),
+--       ])
+--     ).start();
+---  }, []);
+--+  }, [checkingIntro]);
+-- 
+--   const heartTranslateY = heartAnim.interpolate({
+--     inputRange: [0, 1],
+--diff --git a/model.patch b/model.patch
+--index 5d9f76b..e69de29 100644
+----- a/model.patch
+--+++ b/model.patch
+--@@ -1,18 +0,0 @@
+---diff --git a/frontend/app/memories.tsx b/frontend/app/memories.tsx
+---index 51ca983..e6cac96 100644
+------ a/frontend/app/memories.tsx
+---+++ b/frontend/app/memories.tsx
+---@@ -306,6 +306,13 @@ const styles = StyleSheet.create({
+---     flex: 1,
+---     backgroundColor: '#FFF5F7',
+---   },
+---+  backButton: {
+---+    position: 'absolute',
+---+    top: 50,
+---+    left: 16,
+---+    zIndex: 10,
+---+    padding: 8,
+---+  },
+---   content: {
+---     flex: 1,
+---     padding: 24,
