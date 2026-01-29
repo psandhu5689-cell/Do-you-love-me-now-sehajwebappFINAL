@@ -294,7 +294,7 @@ export default function VirtualBed() {
   const [blanketPosition, setBlanketPosition] = useState<'left' | 'center' | 'right'>('center')
   
   // NEW: Dim lights state
-  const [lightsDiv, setLightsDimmed] = useState(false)
+  const [lightsDimmed, setLightsDimmed] = useState(false)
   
   // NEW: Cat sound refs for the uploaded audio files
   const catMeowSoftRef = useRef<Howl | null>(null)
