@@ -233,7 +233,12 @@ function Sprite({ sheet, animations, currentAnimation, onAnimationEnd, scale = 1
 
 const AUDIO = {
   rain: 'https://assets.mixkit.co/active_storage/sfx/1253/1253-preview.mp3',
-  meow: 'https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3',
+  // Cat sounds - using the uploaded audio files
+  catMeowSoft: '/audio/cats/cat-meow-soft.mp3',
+  catMeowNight: '/audio/cats/cat-meow-night.mp3',
+  catMeowFood: '/audio/cats/cat-meow-food.mp3',
+  catScream: '/audio/cats/cat-scream.mp3',
+  // Generic sounds
   tussle: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
   rustle: 'https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3',
 }
