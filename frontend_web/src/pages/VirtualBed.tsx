@@ -553,10 +553,8 @@ export default function VirtualBed() {
     
     switch (action) {
       case 'wake':
-        // Play soft meow for wake up
-        if (userInteracted && catMeowSoftRef.current && !isMuted) {
-          catMeowSoftRef.current.play()
-        }
+        // Play soft meow for wake up with cooldown
+        playCatSound(catMeowSoftRef)
         setCat(prev => ({ 
           ...prev, 
           isAwake: true, 
