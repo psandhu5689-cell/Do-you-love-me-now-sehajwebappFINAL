@@ -466,6 +466,7 @@ export default function TortureChamber() {
                   opacity: isDead ? 0.5 : 1,
                   minHeight: 70,
                   boxShadow: '0 4px 15px rgba(0,0,0,0.2), inset 0 0 15px rgba(239,68,68,0.1)',
+                  pointerEvents: isDead ? 'none' : 'auto',
                 }}
               >
                 <motion.span 
