@@ -491,7 +491,7 @@ export default function VirtualBed() {
           catMeowSoftRef.current.play()
         }
         setCat(prev => ({ ...prev, action: 'nudge', mood: Math.min(100, prev.mood + 15) }))
-        // Increase horniness meter (Prabh increases faster)
+        // Increase freakiness meter (Prabh increases faster)
         if (cat === 'prabh') {
           setPrabhMeter(prev => Math.min(100, prev + 20))
         } else {
