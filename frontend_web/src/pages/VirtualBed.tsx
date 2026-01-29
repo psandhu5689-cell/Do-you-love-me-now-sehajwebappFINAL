@@ -909,7 +909,7 @@ export default function VirtualBed() {
               )}
             </motion.div>
             
-            {/* Prabh Cat (Right - Grey) */}
+            {/* LAYER 6: Prabh Cat (Right - Grey) */}
             <motion.div
               animate={{
                 y: prabh.action === 'nudge' || prabh.action === 'kick' ? [0, -3, 0] : 0,
@@ -917,9 +917,9 @@ export default function VirtualBed() {
               transition={{ duration: 0.3, ease: 'easeOut' }}
               style={{
                 position: 'absolute',
-                right: '18%',
-                bottom: 55,
-                zIndex: 2,
+                right: '25%',
+                bottom: 180,
+                zIndex: 3,
               }}
             >
               <Sprite
