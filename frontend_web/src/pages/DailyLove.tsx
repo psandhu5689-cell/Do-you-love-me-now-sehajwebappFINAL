@@ -221,6 +221,7 @@ export default function DailyLove() {
   const [isHugging, setIsHugging] = useState(false)
   const [hugComplete, setHugComplete] = useState(false)
   const [floatingHearts, setFloatingHearts] = useState<Array<{id: number, x: number, y: number}>>([])
+  const [sadMessageIndex, setSadMessageIndex] = useState(0)
   const hugIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   
   // Calculate time together 
