@@ -464,7 +464,10 @@ export default function VirtualBed() {
     
     switch (action) {
       case 'wake':
-        playSound(AUDIO.meow)
+        // Play soft meow for wake up
+        if (userInteracted && catMeowSoftRef.current && !isMuted) {
+          catMeowSoftRef.current.play()
+        }
         setCat(prev => ({ 
           ...prev, 
           isAwake: true, 
@@ -474,12 +477,19 @@ export default function VirtualBed() {
         break
         
       case 'sleep':
+        // Play soft purr/night sound for sleep
+        if (userInteracted && catMeowNightRef.current && !isMuted) {
+          catMeowNightRef.current.play()
+        }
         setCat(prev => ({ ...prev, isAwake: false, action: 'sleep', mood: Math.min(100, prev.mood + 5) }))
         setShowEffect({ type: 'z', x: isLeft ? 35 : 65, y: 35 })
         break
         
       case 'nudge':
-        playSound(AUDIO.meow)
+        // Play cute chirp for nudge
+        if (userInteracted && catMeowSoftRef.current && !isMuted) {
+          catMeowSoftRef.current.play()
+        }
         setCat(prev => ({ ...prev, action: 'nudge', mood: Math.min(100, prev.mood + 15) }))
         // Increase horniness meter (Prabh increases faster)
         if (cat === 'prabh') {
@@ -498,6 +508,10 @@ export default function VirtualBed() {
         break
         
       case 'kick':
+        // Play annoyed meow for kick
+        if (userInteracted && catMeowNightRef.current && !isMuted) {
+          catMeowNightRef.current.play()
+        }
         haptics.medium()
         setCat(prev => ({ ...prev, action: 'kick', mood: Math.max(0, prev.mood - 5) }))
         setTimeout(() => {
@@ -507,14 +521,27 @@ export default function VirtualBed() {
         break
         
       case 'hog':
-        // REMOVED blanket hogging - no longer using blanket
+        // NEW: Blanket hogging moves blanket left or right
         haptics.medium()
+        // Play rustle sound
+        if (userInteracted && !isMuted) {
+          playSound(AUDIO.rustle)
+        }
+        // Move blanket based on which cat is hogging
+        if (cat === 'sehaj') {
+          setBlanketPosition('left')
+        } else {
+          setBlanketPosition('right')
+        }
         setCat(prev => ({ ...prev, mood: Math.min(100, prev.mood + 10) }))
         setOtherCat(prev => ({ ...prev, action: 'hiss', mood: Math.max(0, prev.mood - 15) }))
         break
         
       case 'feed':
-        playSound(AUDIO.meow)
+        // Play happy meow for food
+        if (userInteracted && catMeowFoodRef.current && !isMuted) {
+          catMeowFoodRef.current.play()
+        }
         setCat(prev => ({ ...prev, action: 'eat', mood: Math.min(100, prev.mood + 20) }))
         // Increase meter slightly
         if (cat === 'prabh') {
@@ -531,6 +558,10 @@ export default function VirtualBed() {
         break
         
       case 'game':
+        // Play chirp for gaming
+        if (userInteracted && catMeowSoftRef.current && !isMuted) {
+          catMeowSoftRef.current.play()
+        }
         setCat(prev => ({ ...prev, action: 'gaming', mood: Math.min(100, prev.mood + 15) }))
         setShowEffect({ type: 'sparkle', x: isLeft ? 35 : 65, y: 45 })
         setTimeout(() => {
