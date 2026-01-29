@@ -1090,10 +1090,29 @@ export default function DailyLove() {
       }
     }
     
-    const handleNextSadMessageNav = () => {
+    // FIXED: Wheel picker for scrollable messages
+    const wheelRef = useRef<HTMLDivElement>(null)
+    const [wheelIndex, setWheelIndex] = useState(0)
+    
+    const handleWheelSpin = () => {
       haptics.light()
-      setSadMessageIndex((prev) => (prev + 1) % SAD_MODE_MESSAGES.length)
-      setSadMessage(SAD_MODE_MESSAGES[(sadMessageIndex + 1) % SAD_MODE_MESSAGES.length])
+      // Vibrate briefly on scroll
+      if (navigator.vibrate) {
+        navigator.vibrate(20)
+      }
+      // Random message on spin
+      const newIndex = Math.floor(Math.random() * SAD_MODE_MESSAGES.length)
+      setWheelIndex(newIndex)
+      setSadMessage(SAD_MODE_MESSAGES[newIndex])
+    }
+    
+    // Handle Quick Kiss vibration
+    const handleQuickKissVibrate = () => {
+      handleQuickKiss()
+      // FIXED: Quick Kiss vibrates
+      if (navigator.vibrate) {
+        navigator.vibrate([50, 30, 50])
+      }
     }
 
     return (
