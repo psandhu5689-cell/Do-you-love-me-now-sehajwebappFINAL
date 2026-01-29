@@ -55,11 +55,15 @@ export default function TortureChamber() {
   const [hp, setHp] = useState(stats.currentHp)
   const [maxHp] = useState(3000)
   const [currentMessage, setCurrentMessage] = useState('')
-  const [floatingMessages, setFloatingMessages] = useState<{ id: string; value: number; isHeal: boolean; timestamp: number }[]>([])
+  const [floatingMessages, setFloatingMessages] = useState<{ id: string; value: number; isHeal: boolean; timestamp: number; x: number; y: number }[]>([])
   const [isShaking, setIsShaking] = useState(false)
   const [isDead, setIsDead] = useState(false)
   const [showJustKidding, setShowJustKidding] = useState(false)
   const [wasJustDamaged, setWasJustDamaged] = useState(false)
+  
+  // Refs to track button positions
+  const damageButtonRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const healButtonRefs = useRef<(HTMLButtonElement | null)[]>([])
   
   // Save HP to storage whenever it changes
   useEffect(() => {
